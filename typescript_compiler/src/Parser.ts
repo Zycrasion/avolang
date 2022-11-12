@@ -257,7 +257,7 @@ export class Parser
             "/": 20
         }
         let left = this.parse_token(token);
-        if (this.next().type == "operator")
+        if (!this.end() && this.next().type == "operator")
         {
             let type = this.current.value;
             let right = this.parse_expr(this.next(), prec);
@@ -333,10 +333,15 @@ export class Parser
                 continue loop;
             }
 
-            nodes.push(this.parse_token());
+            let tok = this.parse_token();
+            if (tok == null)
+            {
+                break;
+            }
+
+            nodes.push(tok);
         }
 
-        console.log(nodes);
 
         return nodes;
     }

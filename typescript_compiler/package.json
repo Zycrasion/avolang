@@ -8,7 +8,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test" : "ts-node-esm ./tests/tokenizer_test.ts"
+    "test" : "ts-node-esm ./tests/tokenizer_test.ts",
+    "unit_tests" : "ts-node-esm ./tests/unit_tests.ts"
   },
   "author": "",
   "license": "ISC",
