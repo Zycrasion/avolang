@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "outDir": "dist",
+        "module": "ESNext",
+        "moduleResolution": "node"
+    },
+    "ts-node": {
+        "transpileOnly": true
+    }
+}

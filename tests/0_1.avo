@@ -1,0 +1,2 @@
+# version 0.1, able to read files and do maths
+var a  = 10 / 10;

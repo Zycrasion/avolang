@@ -1,0 +1,3 @@
+# version 0.2, declare variables and a debug _out
+var example : int = 10;
+_out example;

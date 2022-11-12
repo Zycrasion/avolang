@@ -1,0 +1,10 @@
+# version 0.3 function support
+var example : int = 10;
+
+log(example);
+
+log(example, "f");
+
+var char_example : char = 'f';
+
+log(char_example, ' ', char_example);
