@@ -36,13 +36,13 @@ console.log("=".repeat(30), "\nVariable Tests:\n")
     let boolTest = `var:bool b = true;`;
     let mathTest = `var:int d = 10 + 10 * 20 + (10 - 1);`
 
-    notFailed = test("Char test", JSON.stringify(quickParse(charTest)), `[{"type":"VariableDeclaration","value":"a","left":{"type":"Type","value":"char","left":null,"right":null},"right":{"type":"CharLiteral","value":"l","left":null,"right":null}}]`);
-    notFailed = test("String test", JSON.stringify(quickParse(stringTest)), `[{"type":"VariableDeclaration","value":"a","left":{"type":"Type","value":"string","left":null,"right":null},"right":{"type":"StringLiteral","value":"ahhh","left":null,"right":null}}]`);
-    notFailed = test("Int test", JSON.stringify(quickParse(intTest)), `[{"type":"VariableDeclaration","value":"i","left":{"type":"Type","value":"int","left":null,"right":null},"right":{"type":"int","value":10,"left":null,"right":null}}]`);
-    notFailed = test("Float test", JSON.stringify(quickParse(floatTest)), `[{"type":"VariableDeclaration","value":"f","left":{"type":"Type","value":"float","left":null,"right":null},"right":{"type":"float","value":10.5,"left":null,"right":null}}]`);
-    notFailed = test("Bool test", JSON.stringify(quickParse(boolTest)), `[{"type":"VariableDeclaration","value":"b","left":{"type":"Type","value":"bool","left":null,"right":null},"right":{"type":"Boolean","value":true,"left":null,"right":null}}]`);
+    notFailed = test("Char test", JSON.stringify(quickParse(charTest)), `[{"type":"VariableDeclaration","value":"a","left":{"type":"Type","value":"Char","left":null,"right":null},"right":{"type":"CharLiteral","value":"l","left":null,"right":null}}]`);
+    notFailed = test("String test", JSON.stringify(quickParse(stringTest)), `[{"type":"VariableDeclaration","value":"a","left":{"type":"Type","value":"String","left":null,"right":null},"right":{"type":"StringLiteral","value":"ahhh","left":null,"right":null}}]`);
+    notFailed = test("Int test", JSON.stringify(quickParse(intTest)), `[{"type":"VariableDeclaration","value":"i","left":{"type":"Type","value":"Int","left":null,"right":null},"right":{"type":"Int","value":10,"left":null,"right":null}}]`);
+    notFailed = test("Float test", JSON.stringify(quickParse(floatTest)), `[{"type":"VariableDeclaration","value":"f","left":{"type":"Type","value":"Float","left":null,"right":null},"right":{"type":"Float","value":10.5,"left":null,"right":null}}]`);
+    notFailed = test("Bool test", JSON.stringify(quickParse(boolTest)), `[{"type":"VariableDeclaration","value":"b","left":{"type":"Type","value":"Bool","left":null,"right":null},"right":{"type":"Bool","value":true,"left":null,"right":null}}]`);
     console.warn("!WARN! undefined behaviour may present itself with the current method of parsing maths")
-    notFailed = test("Math test", JSON.stringify(quickParse(mathTest)), `[{"type":"VariableDeclaration","value":"d","left":{"type":"Type","value":"int","left":null,"right":null},"right":{"type":"Expression","value":"+","left":{"type":"int","value":10,"left":null,"right":null},"right":{"type":"Expression","value":"*","left":{"type":"int","value":10,"left":null,"right":null},"right":{"type":"Expression","value":"+","left":{"type":"Expression","value":"-","left":{"type":"int","value":1,"left":null,"right":null},"right":{"type":"int","value":10,"left":null,"right":null}},"right":{"type":"int","value":20,"left":null,"right":null}}}}}]`);
+    notFailed = test("Math test", JSON.stringify(quickParse(mathTest)), `[{"type":"VariableDeclaration","value":"d","left":{"type":"Type","value":"Int","left":null,"right":null},"right":{"type":"Expression","value":"+","left":{"type":"Int","value":10,"left":null,"right":null},"right":{"type":"Expression","value":"*","left":{"type":"Int","value":10,"left":null,"right":null},"right":{"type":"Expression","value":"+","left":{"type":"Expression","value":"-","left":{"type":"Int","value":1,"left":null,"right":null},"right":{"type":"Int","value":10,"left":null,"right":null}},"right":{"type":"Int","value":20,"left":null,"right":null}}}}}]`);
 }
 
 if (!notFailed)
@@ -68,13 +68,13 @@ if (!notFailed)
 
     notFailed = test("Char test", JSON.stringify(quickParse(charTest)), `[{"type":"FunctionCall","value":"print","params":[{"type":"CharLiteral","value":"l","left":null,"right":null}]}]`);
     notFailed = test("String test", JSON.stringify(quickParse(stringTest)), `[{"type":"FunctionCall","value":"print","params":[{"type":"StringLiteral","value":"ahhh","left":null,"right":null}]}]`);
-    notFailed = test("Int test", JSON.stringify(quickParse(intTest)), `[{"type":"FunctionCall","value":"print","params":[{"type":"int","value":10,"left":null,"right":null}]}]`);
-    notFailed = test("Float test", JSON.stringify(quickParse(floatTest)), `[{"type":"FunctionCall","value":"print","params":[{"type":"float","value":10.5,"left":null,"right":null}]}]`);
-    notFailed = test("Bool test", JSON.stringify(quickParse(boolTest)), `[{"type":"FunctionCall","value":"print","params":[{"type":"Boolean","value":true,"left":null,"right":null}]}]`);
+    notFailed = test("Int test", JSON.stringify(quickParse(intTest)), `[{"type":"FunctionCall","value":"print","params":[{"type":"Int","value":10,"left":null,"right":null}]}]`);
+    notFailed = test("Float test", JSON.stringify(quickParse(floatTest)), `[{"type":"FunctionCall","value":"print","params":[{"type":"Float","value":10.5,"left":null,"right":null}]}]`);
+    notFailed = test("Bool test", JSON.stringify(quickParse(boolTest)), `[{"type":"FunctionCall","value":"print","params":[{"type":"Bool","value":true,"left":null,"right":null}]}]`);
     notFailed = test("Identifier test", JSON.stringify(quickParse(identifierTest)), `[{"type":"FunctionCall","value":"print","params":[{"type":"Identifier","value":"a","left":null,"right":null}]}]`);
-    notFailed = test("Multi-Parameter tests", JSON.stringify(quickParse(multiParam)), `[{"type":"FunctionCall","value":"print","params":[{"type":"Identifier","value":"a","left":null,"right":null},{"type":"Boolean","value":true,"left":null,"right":null},{"type":"float","value":10.5,"left":null,"right":null},{"type":"int","value":10,"left":null,"right":null},{"type":"StringLiteral","value":"ahhh","left":null,"right":null},{"type":"CharLiteral","value":"l","left":null,"right":null}]}]`);
+    notFailed = test("Multi-Parameter tests", JSON.stringify(quickParse(multiParam)), `[{"type":"FunctionCall","value":"print","params":[{"type":"Identifier","value":"a","left":null,"right":null},{"type":"Bool","value":true,"left":null,"right":null},{"type":"Float","value":10.5,"left":null,"right":null},{"type":"Int","value":10,"left":null,"right":null},{"type":"StringLiteral","value":"ahhh","left":null,"right":null},{"type":"CharLiteral","value":"l","left":null,"right":null}]}]`);
     console.warn("!WARN! Maths isn't fully supported in function calls")
-    notFailed = test("Math tests", JSON.stringify(quickParse(mathTest)), `[{"type":"FunctionCall","value":"print","params":[{"type":"Expression","value":"+","left":{"type":"int","value":10,"left":null,"right":null},"right":{"type":"int","value":10,"left":null,"right":null}},{"type":"Expression","value":"*","left":{"type":"float","value":2.5,"left":null,"right":null},"right":{"type":"float","value":2.1,"left":null,"right":null}}]}]`);
+    notFailed = test("Math tests", JSON.stringify(quickParse(mathTest)), `[{"type":"FunctionCall","value":"print","params":[{"type":"Expression","value":"+","left":{"type":"Int","value":10,"left":null,"right":null},"right":{"type":"Int","value":10,"left":null,"right":null}},{"type":"Expression","value":"*","left":{"type":"Float","value":2.5,"left":null,"right":null},"right":{"type":"Float","value":2.1,"left":null,"right":null}}]}]`);
 
 }
 

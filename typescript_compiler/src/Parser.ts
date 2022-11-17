@@ -230,14 +230,18 @@ export class Parser
 
             case "true":
             case "false":
-                return Node.createLeaf("Boolean", token.value === "true")
+                return Node.createLeaf("Bool", token.value === "true")
 
             case "int":
             case "float":
             case "bool":
             case "string":
             case "char":
-                return Node.createLeaf("Type", token.value);
+                let Localised = (token.value as string);
+                let LocalisedSplit = Localised.split("");
+                LocalisedSplit[0] = LocalisedSplit[0].toUpperCase()
+                Localised = LocalisedSplit.join("")
+                return Node.createLeaf("Type", Localised);
 
             default:
                 throw new Error("Unrecognised keyword", { cause: token })
@@ -252,7 +256,7 @@ export class Parser
             this.putback();
             return this.parse_expr(token)
         }
-        return Node.createLeaf(token.type, token.value);
+        return Node.createLeaf(token.type == "float" ? "Float" : "Int", token.value);
     }
 
     // for example 10 * 10, parses to {left 10 right 10 type operator value multiply}
@@ -326,6 +330,7 @@ export class Parser
             this.putback();
             return FunctionNode.create("FunctionCall", token.value, this.parse_delimited("(", ",", ")"))
         }
+        this.putback();
 
         return Node.createLeaf("Identifier", token.value);
     }
