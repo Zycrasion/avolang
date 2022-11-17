@@ -140,6 +140,10 @@ export class Scope
 
     eval_node(node: INode = this.current): { type: string, value: number }
     {
+        if (node==null) 
+        {
+            this.scream("NULL TOKEN");
+        }
         switch (node.type)
         {
             case "FunctionCall":
@@ -169,20 +173,6 @@ export class Scope
                 let value = this.eval_node(VariableRaw.right) as { type: string, value: any };
                 if (value.type != Variable.type) this.scream(["TYPE MISMATCH", value.type, Variable.type].join(" "))
                 Variable.value = value.value;
-
-                // if (VariableRaw.right.type == "Identifier")
-                // {
-                //     let id = this.grab_id(VariableRaw.right.value);
-                //     if (id==null) this.scream("IDENTIFIER IS NOT DECLARED");
-                //     if (id.type != Variable.type) this.scream("TYPE MISMATCH")
-
-                //     Variable.value = id.value;
-                // } else 
-                // {
-                //     if (VariableRaw.right.type != Variable.type) this.scream("TYPE DOESN'T MATCH");
-                //     Variable.value = VariableRaw.right.value;
-                // }
-
 
                 this.variables[this.current.value] = Variable;
                 return { type: Variable.type, value: Variable.value }
