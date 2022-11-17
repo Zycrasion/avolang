@@ -176,11 +176,14 @@ export class Parser
     public current: Token;
     public index: number;
 
+    private allowMath : boolean;
+
     constructor(tokens: Token[])
     {
         this.tokens = tokens;
         this.index = 0;
         this.current = tokens[this.index];
+        this.allowMath = true;
     }
 
     next(): Token
@@ -244,6 +247,11 @@ export class Parser
 
     parse_num(token: Token = this.current) : INode
     {
+        if (this.allowMath && this.next().type == "operator")
+        {
+            this.putback();
+            return this.parse_expr(token)
+        }
         return Node.createLeaf(token.type, token.value);
     }
 
@@ -256,11 +264,28 @@ export class Parser
             "*": 20,
             "/": 20
         }
+        this.allowMath = false;
         let left = this.parse_token(token);
+        this.allowMath = true;
         if (!this.end() && this.next().type == "operator")
         {
             let type = this.current.value;
-            let right = this.parse_expr(this.next(), prec);
+
+            // It works, for some reason, dont ask, never ask
+            let rightTok = this.next();
+            if (rightTok.value == "(")
+            {
+                rightTok = this.next();
+            }
+            if (rightTok.value == ")")
+            {
+                return null;
+            }
+            let right = this.parse_expr(rightTok, op_prec[type]);
+            if (right == null)
+            {
+                return null;
+            }
             if (op_prec[type] > prec)
             {
                 return Node.create(
@@ -368,7 +393,7 @@ export class Parser
                 return this.parse_string(token);
 
             case "operator":
-                return this.parse_expr(token);
+                return null;
 
             default:
                 throw new Error(`Unexpected Token .`, { cause: this.current })
