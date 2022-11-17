@@ -6,7 +6,7 @@ const __THROW_ERROR_ON_FAIL__ = true;
 
 function test(testName: string, out: string, expect: string)
 {
-    let text = `${testName} [${out == expect ? "✅" : "✘"}]${out != expect ? `\n\tExpected was ${expect}\n\tGot ${out}` : ""}`;
+    let text = `${testName} [${out == expect ? "✔" : "✘"}]${out != expect ? `\n\tExpected was ${expect}\n\tGot ${out}` : ""}`;
     console.log(text);
     if (out != expect)
     {
