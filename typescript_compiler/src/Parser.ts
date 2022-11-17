@@ -191,6 +191,11 @@ export class Parser
         return this.current = this.tokens.at(this.index++);
     }
 
+    peek() : Token
+    {
+        return this.tokens.at(this.index + 1);
+    }
+
     putback(): Token
     {
         return this.current = this.tokens.at(this.index--);
@@ -251,9 +256,8 @@ export class Parser
 
     parse_num(token: Token = this.current) : INode
     {
-        if (this.allowMath && this.next().type == "operator")
+        if (this.allowMath && this.peek().type == "operator")
         {
-            this.putback();
             return this.parse_expr(token)
         }
         return Node.createLeaf(token.type == "float" ? "Float" : "Int", token.value);
@@ -324,6 +328,14 @@ export class Parser
         {
             throw new Error("ERROR NOT ID", { cause: token })
         }
+
+        if (this.next().value == ".")
+        {
+            let funcOrVar = this.parse_id(this.next());
+            funcOrVar.value = token.value + "." + funcOrVar.value;
+            return funcOrVar;
+        }
+        this.putback();
 
         if (this.next().value == "(")
         {

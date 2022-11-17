@@ -1,26 +1,28 @@
-import { INode, Node } from './Parser';
+import { FunctionNode, INode, Node } from './Parser';
+type ReturnTypes = "Int" | "Float" | "Char" | "Bool" | "String" | "Void"
 
 export class AvoVariable
 {
-    name : string;
-    type : string;
-    value : any;
+    name: string;
+    type: string;
+    value: any;
 }
-
 export class AvoFunction
 {
-    callback : (...a : any) => any;
-    constructor(callback : (...a : any) => any)
+    returnType: string;
+    callback: (...a: any) => any;
+    constructor(callback: (...a: any) => any, returnType: ReturnTypes)
     {
         this.callback = callback;
+        this.returnType = returnType;
     }
 
-    call(args : any[])
+    call(args: any[])
     {
-        this.callback(...args);
+        return this.callback(...args);
     }
 
-    static createFromAvo(Tree : INode[])
+    static createFromAvo(Tree: INode[])
     {
 
     }
@@ -28,24 +30,31 @@ export class AvoFunction
 
 interface VariableTable
 {
-    [Name : string] : AvoVariable;
+    [Name: string]: AvoVariable;
+}
+
+interface FunctionTable
+{
+    [Name: string]: AvoFunction;
 }
 
 export class Scope
 {
-    variables : VariableTable;
-    current : INode;
-    index : number;
-    AST : INode[];
+    variables: VariableTable;
+    functions: FunctionTable;
+    current: INode;
+    index: number;
+    AST: INode[];
 
-    constructor(AST : INode[])
+    constructor(AST: INode[])
     {
         this.variables = {};
+        this.functions = {};
         this.index = -1;
         this.AST = AST;
         this.next();
     }
-    
+
     next()
     {
         this.current = this.AST.at(this.index++);
@@ -68,32 +77,83 @@ export class Scope
         return this.index >= this.AST.length;
     }
 
-    scream(msg : string)
+    scream(msg: string)
     {
-        throw new Error(msg, {cause : JSON.stringify(this.current)})
+        throw new Error(msg, { cause: JSON.stringify(this.current) })
     }
 
-    grab_id(id : string) 
+    grab_id(id: string) 
     {
         if (id in this.variables)
         {
-            return {type:this.variables[id].type , value:this.variables[id].value};
+            return { type: this.variables[id].type, value: this.variables[id].value };
         } else 
         {
             return null;
         }
     }
 
-    eval_node(node : INode = this.current)
+    eval_expr(node: Node): { type: string, value: number }
     {
-        switch(node.type)
+
+        let op = node.value;
+        let left = this.eval_node(node.left as Node);
+        let right = this.eval_node(node.right as Node);
+        if (left.type != right.type) this.scream("TYPE MISMATCH");
+        let result = 0;
+        switch (op)
         {
+            case "*":
+                result = left.value * right.value
+                break;
+            case "+":
+                result = left.value + right.value
+                break;
+            case "-":
+                result = left.value - right.value
+                break;
+            case "/":
+                result = left.value / right.value
+                break;
+            default:
+                this.scream("UNRECOGNISED OPERATION")
+        }
+        return { type: left.type, value: result }
+    }
+
+    // i know specifying return type like this is bad practice but im lazy
+    eval_function_call(node: FunctionNode): { type: string, value: number }
+    {
+        if (node.value in this.functions)
+        {
+            let result = this.functions[node.value].call(node.params.map(v =>
+            {
+                return this.eval_node(v).value;
+            }));
+            return { type: this.functions[node.value].returnType, value: result}
+        }
+        else 
+        {
+            this.scream("FUNCTION NOT DEFINED");
+        }
+    }
+
+    eval_node(node: INode = this.current): { type: string, value: number }
+    {
+        switch (node.type)
+        {
+            case "FunctionCall":
+                return this.eval_function_call(node as FunctionNode);
+
+            case "Expression":
+                return this.eval_expr(node as Node);
+
             case "Int":
             case "Float":
             case "Char":
             case "Bool":
             case "String":
-                return {type:node.type, value:node.value};
+                return { type: node.type, value: node.value };
 
             case "Identifier":
                 return this.grab_id(node.value);
@@ -106,8 +166,8 @@ export class Scope
                 Variable.type = VariableRaw.left.value;
                 Variable.name = VariableRaw.value;
 
-                let value = this.eval_node(VariableRaw.right) as {type : string, value : any};
-                if (value.type != Variable.type) this.scream(["TYPE MISMATCH",value.type,Variable.type].join(" "))
+                let value = this.eval_node(VariableRaw.right) as { type: string, value: any };
+                if (value.type != Variable.type) this.scream(["TYPE MISMATCH", value.type, Variable.type].join(" "))
                 Variable.value = value.value;
 
                 // if (VariableRaw.right.type == "Identifier")
@@ -125,7 +185,7 @@ export class Scope
 
 
                 this.variables[this.current.value] = Variable;
-                return {type : Variable.type, value : Variable.value}
+                return { type: Variable.type, value: Variable.value }
 
             default:
                 this.scream("UNRECOGNISED TOKEN ".concat(JSON.stringify(node)))
