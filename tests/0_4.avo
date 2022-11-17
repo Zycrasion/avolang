@@ -1,12 +1,12 @@
 # version 0.4 main function and function declaration
 
-func print_int : void (a : int)
+func<void> print_int(a : int)
 {
     log(a);
     return;
 }
 
-func main : int ()
+func<int> main()
 {
     print_int(10);
     return 1;

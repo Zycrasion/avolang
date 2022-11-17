@@ -1,5 +1,5 @@
 # version 0.3 function support
-var example : int = 10;
+var : int example = 10;
 
 log(example);
 
