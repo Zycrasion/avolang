@@ -16,19 +16,13 @@ function main()
 {
     let token = new Tokeniser(`
     var:int a = 1 - 2 * 3;
-    var:int b = a / 2;
-    var:char c = 'l';
-    var:string d = "lmao";
-    
-    print(a,b,c,d );
-
     `);
     let tokens = token.read();
     console.log(tokens);
 
-    let tree = new Parser(tokens);
-    let nodes = tree.read();
-    console.log(JSON.stringify(nodes, (key, value) => value == null ? undefined : value));
+    // let tree = new Parser(tokens);
+    // let nodes = tree.read();
+    // console.log(JSON.stringify(nodes, (key, value) => value == null ? undefined : value));
 }
 
 main();

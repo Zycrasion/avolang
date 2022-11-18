@@ -1,5 +1,4 @@
 import { Token } from "./Tokeniser";
-
 export class Parser
 {
     private tokens: Token[];
@@ -7,14 +6,11 @@ export class Parser
     public current: Token;
     public index: number;
 
-    private allowMath : boolean;
-
     constructor(tokens: Token[])
     {
         this.tokens = tokens;
         this.index = 0;
         this.current = tokens[this.index];
-        this.allowMath = true;
     }
 
     next(): Token
@@ -22,9 +18,11 @@ export class Parser
         return this.current = this.tokens.at(this.index++);
     }
 
-    peek() : Token
+    peek(): Token
     {
-        return this.tokens.at(this.index + 1);
+        let tok = this.tokens.at(this.index++);
+        this.index--;
+        return tok;
     }
 
     putback(): Token
@@ -73,10 +71,8 @@ export class Parser
             case "bool":
             case "string":
             case "char":
-                let Localised = (token.value as string);
-                let LocalisedSplit = Localised.split("");
-                LocalisedSplit[0] = LocalisedSplit[0].toUpperCase()
-                Localised = LocalisedSplit.join("")
+                let Localised = (token.value as string)
+                Localised = Localised.at(0).toUpperCase() + Localised.slice(1);
                 return Node.createLeaf("Type", Localised);
 
             default:
@@ -85,9 +81,9 @@ export class Parser
         return null;
     }
 
-    parse_num(token: Token = this.current) : INode
+    parse_num(token: Token = this.current, ExpressionDetection : boolean): INode
     {
-        if (this.allowMath && this.peek().type == "operator")
+        if (ExpressionDetection && this.peek().type == "operator")
         {
             return this.parse_expr(token)
         }
@@ -95,7 +91,7 @@ export class Parser
     }
 
     // for example 10 * 10, parses to {left 10 right 10 type operator value multiply}
-    parse_expr(token: Token = this.current, prec: number = 0): INode
+    parse_expr(token: Token = this.current): INode
     {
         const op_prec = {
             "+": 10,
@@ -103,45 +99,60 @@ export class Parser
             "*": 20,
             "/": 20
         }
-        this.allowMath = false;
-        let left = this.parse_token(token);
-        this.allowMath = true;
-        if (!this.end() && this.next().type == "operator")
-        {
-            let type = this.current.value;
 
-            // It works, for some reason, dont ask, never ask
-            let rightTok = this.next();
-            if (rightTok.value == "(")
-            {
-                rightTok = this.next();
-            }
-            if (rightTok.value == ")")
-            {
-                return null;
-            }
-            let right = this.parse_expr(rightTok, op_prec[type]);
-            if (right == null)
-            {
-                return null;
-            }
-            if (op_prec[type] > prec)
-            {
-                return Node.create(
-                    "Expression",
-                    type,
-                    left,
-                    right
-                )
-            }
+        let left = this.parse_token(token, false);
+        if (this.end()) throw new Error("UNEXPECTED EOF");
+        if (!(left.type == "Float" || left.type == "Int")) return left;
+        let operator = this.parse_token(this.peek());
+        if (operator.type != "Operator")
+        {
+            return left;
+        }
+        this.next();
+        let right = this.parse_token(this.next());
+        if (right.type == "Expression" && op_prec[right.value] > op_prec[operator.value])
+        {
             return Node.create(
                 "Expression",
-                type,
+                operator.value,
                 right,
                 left
             )
         }
-        return left;
+        return Node.create(
+            "Expression",
+            operator.value,
+            left,
+            right
+        )
+    }
+
+    parse_id(token: Token = this.current, ExpressionDetection : boolean): INode
+    {
+        if (token.type != "identifier")
+        {
+            throw new Error("ERROR NOT ID", { cause: token })
+        }
+
+        if (ExpressionDetection && this.peek().type=="operator")
+        {
+            return this.parse_expr(token);
+        }
+
+        if (this.peek().value == ".")
+        {
+            this.next();
+            let funcOrVar = this.parse_id(this.next(), false);
+            funcOrVar.value = token.value + "." + funcOrVar.value;
+            return funcOrVar;
+        }
+
+        if (this.peek().value == "(")
+        {
+            return FunctionNode.create("FunctionCall", token.value, this.parse_delimited("(", ",", ")"))
+        }
+
+        return Node.createLeaf("Identifier", token.value);
     }
 
     grab_id(token: Token = this.current): string
@@ -153,32 +164,7 @@ export class Parser
         return token.value;
     }
 
-    parse_id(token: Token = this.current): INode
-    {
-        if (token.type != "identifier")
-        {
-            throw new Error("ERROR NOT ID", { cause: token })
-        }
-
-        if (this.next().value == ".")
-        {
-            let funcOrVar = this.parse_id(this.next());
-            funcOrVar.value = token.value + "." + funcOrVar.value;
-            return funcOrVar;
-        }
-        this.putback();
-
-        if (this.next().value == "(")
-        {
-            this.putback();
-            return FunctionNode.create("FunctionCall", token.value, this.parse_delimited("(", ",", ")"))
-        }
-        this.putback();
-
-        return Node.createLeaf("Identifier", token.value);
-    }
-
-    parse_string(token : Token = this.current) : INode
+    parse_string(token: Token = this.current): INode
     {
         if (token.type == "string" || token.type == "char")
         {
@@ -187,20 +173,20 @@ export class Parser
         throw new Error("TOKEN NOT STRING OR CHAR");
     }
 
-    parse_delimited(start : string, separator : string, endString : string) : INode[]
+    parse_delimited(start: string, separator: string, endString: string): INode[]
     {
-        let nodes : INode[] = [];
+        let nodes: INode[] = [];
         if (this.next().value != start)
         {
-            throw new Error("UNEXPECTED TOKEN "+JSON.stringify(this.current));
+            throw new Error("UNEXPECTED TOKEN " + JSON.stringify(this.current));
         }
 
 
         loop:
-        while(this.current.value !== endString)
+        while (this.current.value !== endString)
         {
             this.next()
-
+            
             if (this.current.value == separator)
             {
                 continue loop;
@@ -219,7 +205,7 @@ export class Parser
         return nodes;
     }
 
-    parse_token(token: Token = this.current): INode
+    parse_token(token: Token = this.current, ExpressionDetection = true): INode
     {
         switch (token.type)
         {
@@ -230,18 +216,18 @@ export class Parser
                 break;
 
             case "identifier":
-                return this.parse_id(token);
+                return this.parse_id(token, ExpressionDetection);
 
             case "float":
             case "int":
-                return this.parse_num(token);
+                return this.parse_num(token, ExpressionDetection);
 
             case "char":
             case "string":
                 return this.parse_string(token);
 
             case "operator":
-                return null;
+                return Node.createLeaf("Operator", token.value);
 
             default:
                 throw new Error(`Unexpected Token .`, { cause: this.current })
@@ -256,7 +242,7 @@ export class Parser
         while (!this.end())
         {
             this.next();
-            let a  = this.parse_token();
+            let a = this.parse_token();
             if (a != null)
             {
                 node.push(a);
@@ -269,8 +255,8 @@ export class Parser
 
 export interface INode
 {
-    type : string;
-    value : any;
+    type: string;
+    value: any;
 }
 
 export class Node implements INode
@@ -300,9 +286,9 @@ export class FunctionNode implements INode
 {
     type: string;
     value: any;
-    params : INode[];
+    params: INode[];
 
-    static create(type: string, value: any, params : INode[])
+    static create(type: string, value: any, params: INode[])
     {
         let a = new FunctionNode();
         a.type = type;

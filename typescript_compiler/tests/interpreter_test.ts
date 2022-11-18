@@ -16,14 +16,16 @@ function repeat(times: number, str: string | number): string
 function main()
 {
     let token = new Tokeniser(`
-    var:int random_variable = rand.randint(5);
+    var:int random_variable = rand.randint(5 + 5);
     var:float random_float = rand.randfloat(100);
-    out.print(2, random_variable, random_float);
+    out.print(2, random_variable, random_float, 10 * 5 + 5);
     `);
     let tokens = token.read();
 
     let tree = new Parser(tokens);
     let nodes = tree.read();
+    console.log(JSON.stringify(nodes));
+
     let scope = new Scope(nodes);
 
 
@@ -45,7 +47,6 @@ function main()
     scope.walk();
 
     console.log(repeat(50, "=").concat("FINISHED PROGRAM").concat(repeat(50, "=")))
-    console.log(JSON.stringify(nodes));
     console.log(JSON.stringify(scope))
 }
 
