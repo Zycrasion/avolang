@@ -101,10 +101,10 @@ export class Parser
         }
 
         let left = this.parse_token(token, false);
-        if (this.end()) throw new Error("UNEXPECTED EOF");
-        if (!(left.type == "Float" || left.type == "Int")) return left;
+        // if (!(left.type == "Float" || left.type == "Int")) return left;
+        if (left.type != "Float" && left.type != "Int") return left;
         let operator = this.parse_token(this.peek());
-        if (operator.type != "Operator")
+        if (operator == null || operator.type != "Operator")
         {
             return left;
         }

@@ -16,9 +16,10 @@ function repeat(times: number, str: string | number): string
 function main()
 {
     let token = new Tokeniser(`
-    var:int random_variable = rand.randint(5 + 5);
+    var:int random_variable = rand.randint(5);
     var:float random_float = rand.randfloat(100);
     out.print(2, random_variable, random_float);
+    var:int a = out.print(5 + 5);
     `);
     let tokens = token.read();
 
@@ -45,9 +46,9 @@ function main()
 
     scope.walk();
 
-    console.log(repeat(50, "=").concat("FINISHED PROGRAM").concat(repeat(50, "=")))
-    console.log(JSON.stringify(nodes));
-    console.log(JSON.stringify(scope))
+    // console.log(repeat(50, "=").concat("FINISHED PROGRAM").concat(repeat(50, "=")))
+    // console.log(JSON.stringify(nodes));
+    // console.log(JSON.stringify(scope))
 }
 
 main();
