@@ -1,6 +1,6 @@
 {
   "name": "typescript_compiler",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "main": "tests/tokenizer_test.ts",
   "type": "module",
