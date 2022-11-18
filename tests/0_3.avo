@@ -1,10 +1,10 @@
 # version 0.3 function support
 var : int example = 10;
 
-log(example);
+out.print(example);
 
-log(example, "f");
+out.print(example, "f");
 
 var char_example : char = 'f';
 
-log(char_example, ' ', char_example);
+out.print(char_example, ' ', char_example);
