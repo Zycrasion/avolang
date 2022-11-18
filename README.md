@@ -18,7 +18,7 @@ var:char char_example  'l';
 var:int int_example = 10;
 ```
 Typescript:
-```
+```ts
 let char_example : string = "l";
 let int_example : number = 10;
 ```
@@ -32,7 +32,7 @@ func<void> print_AHHHH()
 }
 ```
 Typescript:
-```
+```ts
 function print_AHHHH() : void
 {
     console.log("AHHHH");
