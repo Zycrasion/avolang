@@ -1,4 +1,6 @@
-import { Tokeniser, Parser } from "../src/Parser.js";
+import { Parser } from "../src/Parser.js";
+import { Tokeniser } from "../src/Tokeniser.js";
+
 function repeat(times : number, str : string | number) : string
 {
     let finalStr : string = ""; 

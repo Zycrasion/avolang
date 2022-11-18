@@ -1,9 +1,11 @@
 import { AvoFunction, Scope } from "../src/Interpreter.js";
-import { Tokeniser, Parser } from "../src/Parser.js";
-function repeat(times : number, str : string | number) : string
+import { Tokeniser } from "../src/Tokeniser.js";
+import { Parser } from "../src/Parser.js";
+
+function repeat(times: number, str: string | number): string
 {
-    let finalStr : string = ""; 
-    for (let index : number = 0; index < times; index++) // loop over for the amount of times times specifies
+    let finalStr: string = "";
+    for (let index: number = 0; index < times; index++) // loop over for the amount of times times specifies
     {
         finalStr += str.toString(); // add str to final string
     }
@@ -23,20 +25,23 @@ function main()
     let tree = new Parser(tokens);
     let nodes = tree.read();
     let scope = new Scope(nodes);
-    
 
-    scope.functions["out.print"] = new AvoFunction((...a : any) => {
+
+    scope.functions["out.print"] = new AvoFunction((...a: any) =>
+    {
         console.log(a.join(" "))
     }, "Void")
 
-    scope.functions["rand.randint"] = new AvoFunction((...a : any) =>{
+    scope.functions["rand.randint"] = new AvoFunction((...a: any) =>
+    {
         return Math.floor(Math.random() * a[0])
     }, "Int")
 
-    scope.functions["rand.randfloat"] = new AvoFunction((...a : any) =>{
+    scope.functions["rand.randfloat"] = new AvoFunction((...a: any) =>
+    {
         return Math.random() * a[0]
     }, "Float")
-    
+
     scope.walk();
 
     console.log(repeat(50, "=").concat("FINISHED PROGRAM").concat(repeat(50, "=")))

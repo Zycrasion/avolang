@@ -1,5 +1,5 @@
-import { Parser, Tokeniser } from "../src/Parser.js";
-
+import { Parser } from "../src/Parser.js";
+import { Tokeniser } from "../src/Tokeniser.js";
 let notFailed = true;
 let numFailed = 0;
 const __THROW_ERROR_ON_FAIL__ = true;
