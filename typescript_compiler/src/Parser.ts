@@ -110,15 +110,7 @@ export class Parser
         }
         this.next();
         let right = this.parse_token(this.next());
-        if (right.type == "Expression" && op_prec[right.value] > op_prec[operator.value])
-        {
-            return Node.create(
-                "Expression",
-                operator.value,
-                right,
-                left
-            )
-        }
+        
         return Node.create(
             "Expression",
             operator.value,
