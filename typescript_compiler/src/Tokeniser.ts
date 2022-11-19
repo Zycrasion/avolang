@@ -93,6 +93,10 @@ export class Tokeniser
         return str;
     }
 
+    /**
+     * Main dispatcher
+     * @returns the Tokens
+     */
     read(): Token[]
     {
         let tokens: Token[] = [];
@@ -118,6 +122,63 @@ export class Tokeniser
             }
         }
         return tokens;
+    }
+    
+    /**
+     * utility function for ```convert_to_pn()```
+     * @param expr_stack stack to compute polish notation for
+     * @returns 
+     */
+    private pn_parse_stack(expr_stack : Token[]) : Token[]
+    {
+        let rpn : Token[] = [];
+        if (expr_stack.length > 1 && expr_stack[1].type == "operator")
+        {
+            rpn.push(expr_stack[1], ...this.pn_parse_stack([expr_stack[0]]), ...this.pn_parse_stack(expr_stack.slice(2)));
+            return rpn;
+        }
+        else
+        {
+            return [expr_stack[0]];
+        }
+    }
+
+    /**
+     * Converts tokens to polish notation
+     * @param tokens Tokens to convert to polish notation
+     */
+    convert_to_pn(tokens : Token[])
+    {
+        let pn : Token[] = [];
+        // 2, -, 3
+        let expr_stack : Token[] = [];
+        // - 2 3
+        for (let index = 0; index < tokens.length; index++)
+        {
+            let current = tokens[index];
+            switch (current.type)
+            {
+                case "int":
+                case "float":
+                case "operator":
+                    expr_stack.push(current);
+                    break;
+                
+                default:
+                    if (expr_stack.length > 0)
+                    {
+                        pn.push(...this.pn_parse_stack(expr_stack));  
+                        expr_stack = [];    
+                    }
+                    pn.push(current)
+            }
+        }
+        if (expr_stack.length > 0)
+        {
+            pn.push(...this.pn_parse_stack(expr_stack));  
+            expr_stack = [];    
+        }
+        return pn;
     }
 
 }

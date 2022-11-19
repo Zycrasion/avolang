@@ -14,12 +14,15 @@ function repeat(times : number, str : string | number) : string
 
 function main()
 {
+    // 1 - 2 * 3
+    // or in reverse polish notation
+    // - 1 * 2 3
     let token = new Tokeniser(`
-    var:int a = 1 - 2 * 3;
+    var:int a = 2 * 1-2*3;
     `);
     let tokens = token.read();
-    console.log(tokens);
-
+    console.log(tokens.map(v => v.value).join(" "));
+    console.log(token.convert_to_pn(tokens).map(v => v.value).join(" "))
     // let tree = new Parser(tokens);
     // let nodes = tree.read();
     // console.log(JSON.stringify(nodes, (key, value) => value == null ? undefined : value));
