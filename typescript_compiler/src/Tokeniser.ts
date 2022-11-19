@@ -160,6 +160,7 @@ export class Tokeniser
             {
                 case "int":
                 case "float":
+                case "identifier":
                 case "operator":
                     expr_stack.push(current);
                     break;
