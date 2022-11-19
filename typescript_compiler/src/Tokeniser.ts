@@ -134,7 +134,7 @@ export class Tokeniser
         let rpn : Token[] = [];
         if (expr_stack.length > 1 && expr_stack[1].type == "operator")
         {
-            rpn.push(expr_stack[1], ...this.pn_parse_stack([expr_stack[0]]), ...this.pn_parse_stack(expr_stack.slice(2)));
+            rpn.push(expr_stack[1], expr_stack[0], ...this.pn_parse_stack(expr_stack.slice(2)));
             return rpn;
         }
         else

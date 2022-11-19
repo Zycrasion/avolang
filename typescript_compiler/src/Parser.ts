@@ -105,19 +105,11 @@ export class Parser
         let rhs = this.parse_token(this.next());
         if (op_prec[rhs.value] < op_prec[op])
         {
-            // Dear God, 
-            // typescript was meant to forbid unknown types.
-            // So yes, i am indeed going to hell.
-            // From me,
-
-            // Hi Satan, i request entry into hell.
-            // Attached below you will see my resume
-
             let _op = op;
-            let _lhs = Object.assign({}, lhs) as unknown;
-            let _rhs = Object.assign({}, rhs) as unknown;
-            let r_rhs = Object.assign({}, (rhs as Node).right) as unknown;
-            let r_lhs = Object.assign({}, (rhs as Node).left) as unknown;
+            let _lhs = Object.assign({}, lhs);
+            let _rhs = Object.assign({}, rhs);
+            let r_rhs = Object.assign({}, (rhs as Node).right);
+            let r_lhs = Object.assign({}, (rhs as Node).left);
 
             op = rhs.value;
             lhs = r_rhs as INode; 
@@ -125,10 +117,6 @@ export class Parser
             rhs.value = _op;
             (rhs as Node).left = _lhs as Node;
             (rhs as Node).right = r_lhs as Node;
-
-            // From me,
-            // P.S Am i too bad for hell? i haven't really given it thought.
-            // Is there an underworld below hell?
         }
         return Node.create(
             "Expression",
