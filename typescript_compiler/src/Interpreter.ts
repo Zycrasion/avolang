@@ -154,9 +154,11 @@ export class Scope
 
             case "Int":
             case "Float":
+            case "CharLiteral":
             case "Char":
             case "Bool":
             case "String":
+            case "StringLiteral":
                 return { type: node.type, value: node.value };
 
             case "Identifier":

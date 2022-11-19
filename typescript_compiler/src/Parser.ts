@@ -1,4 +1,5 @@
-import { Token } from "./Tokeniser";
+import { check } from "./ParseTests.js";
+import { Token } from "./Tokeniser.js";
 export class Parser
 {
     private tokens: Token[];
@@ -48,7 +49,7 @@ export class Parser
                     let type = this.parse_keyword(this.next());
                     let name = this.grab_id(this.next());
                     if (this.next().value != "=") { throw new Error("NO =") }
-                    let value = this.parse_expr(this.next());
+                    let value = this.parse_token(this.next());
 
                     return Node.create(
                         "VariableDeclaration",
@@ -81,60 +82,70 @@ export class Parser
         return null;
     }
 
-    parse_num(token: Token = this.current, ExpressionDetection : boolean): INode
+    parse_num(token: Token = this.current): INode
     {
-        if (ExpressionDetection && this.peek().type == "operator")
-        {
-            return this.parse_expr(token)
-        }
         return Node.createLeaf(token.type == "float" ? "Float" : "Int", token.value);
     }
 
-    // for example 10 * 10, parses to {left 10 right 10 type operator value multiply}
-    parse_expr(token: Token = this.current): INode
+    /**
+     * Parses Polish Notation into AST
+     * @param operator Main operator
+     */
+    parse_expr(operator: Token = this.current): Node
     {
         const op_prec = {
-            "+": 10,
-            "-": 10,
-            "*": 20,
-            "/": 20
+            "+" : 10,
+            "-" : 10, 
+            "*" : 20,
+            "/" : 20
         }
-
-        let left = this.parse_token(token, false);
-        // if (!(left.type == "Float" || left.type == "Int")) return left;
-        if (left.type != "Float" && left.type != "Int") return left;
-        let operator = this.parse_token(this.peek());
-        if (operator == null || operator.type != "Operator")
+        if (!check.op(operator)) throw new Error("Parameter passed to parse_expr isn't an operator", {cause: operator});
+        let op = operator.value;
+        let lhs = this.parse_token(this.next());
+        let rhs = this.parse_token(this.next());
+        if (op_prec[rhs.value] < op_prec[op])
         {
-            return left;
+            // God, typescript was meant to forbid unknown types.
+            // So yes, i am indeed going to hell.
+
+            // Hi Satan, i request entry into hell.
+            // Attached below you will see my resume
+
+            let _op = op;
+            let _lhs = Object.assign({}, lhs) as unknown;
+            let _rhs = Object.assign({}, rhs) as unknown;
+            let r_rhs = Object.assign({}, (rhs as Node).right) as unknown;
+            let r_lhs = Object.assign({}, (rhs as Node).left) as unknown;
+
+            op = rhs.value;
+            lhs = r_rhs as INode;
+
+            rhs.value = _op;
+            (rhs as Node).left = _lhs as Node;
+            (rhs as Node).right = r_lhs as Node;
+
+            // From me,
+            // P.S Am i too bad for hell? i haven't really given it thought.
         }
-        this.next();
-        let right = this.parse_token(this.next());
-        
         return Node.create(
             "Expression",
-            operator.value,
-            left,
-            right
+            op,
+            lhs,
+            rhs
         )
     }
 
-    parse_id(token: Token = this.current, ExpressionDetection : boolean): INode
+    parse_id(token: Token = this.current): INode
     {
         if (token.type != "identifier")
         {
             throw new Error("ERROR NOT ID", { cause: token })
         }
 
-        if (ExpressionDetection && this.peek().type=="operator")
-        {
-            return this.parse_expr(token);
-        }
-
         if (this.peek().value == ".")
         {
             this.next();
-            let funcOrVar = this.parse_id(this.next(), false);
+            let funcOrVar = this.parse_id(this.next());
             funcOrVar.value = token.value + "." + funcOrVar.value;
             return funcOrVar;
         }
@@ -178,7 +189,7 @@ export class Parser
         while (this.current.value !== endString)
         {
             this.next()
-            
+
             if (this.current.value == separator)
             {
                 continue loop;
@@ -197,7 +208,7 @@ export class Parser
         return nodes;
     }
 
-    parse_token(token: Token = this.current, ExpressionDetection = true): INode
+    parse_token(token: Token = this.current): INode
     {
         switch (token.type)
         {
@@ -208,18 +219,18 @@ export class Parser
                 break;
 
             case "identifier":
-                return this.parse_id(token, ExpressionDetection);
+                return this.parse_id(token);
 
             case "float":
             case "int":
-                return this.parse_num(token, ExpressionDetection);
+                return this.parse_num(token);
 
             case "char":
             case "string":
                 return this.parse_string(token);
 
             case "operator":
-                return Node.createLeaf("Operator", token.value);
+                return this.parse_expr(token);
 
             default:
                 throw new Error(`Unexpected Token .`, { cause: this.current })

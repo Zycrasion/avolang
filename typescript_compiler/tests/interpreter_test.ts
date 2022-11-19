@@ -19,15 +19,20 @@ function main()
     var:int random_variable = rand.randint(5);
     var:float random_float = rand.randfloat(100);
     out.print(2, random_variable, random_float);
-    var:int a = out.print(5 + 5);
+    out.print("TESTING POLISH NOTATION")
+    out.print(3 * 2 + 1 / 2);
     `);
     let tokens = token.read();
+    tokens = token.convert_to_pn(tokens);
+
+    console.log(tokens);
 
     let tree = new Parser(tokens);
     let nodes = tree.read();
 
-    let scope = new Scope(nodes);
+    console.log(JSON.stringify(nodes));
 
+    let scope = new Scope(nodes);
 
     scope.functions["out.print"] = new AvoFunction((...a: any) =>
     {
