@@ -131,11 +131,11 @@ export class Tokeniser
      */
     private pn_parse_stack(expr_stack : Token[]) : Token[]
     {
-        let rpn : Token[] = [];
+        let pn : Token[] = [];
         if (expr_stack.length > 1 && expr_stack[1].type == "operator")
         {
-            rpn.push(expr_stack[1], expr_stack[0], ...this.pn_parse_stack(expr_stack.slice(2)));
-            return rpn;
+            pn.push(expr_stack[1], expr_stack[0], ...this.pn_parse_stack(expr_stack.slice(2)));
+            return pn;
         }
         else
         {
