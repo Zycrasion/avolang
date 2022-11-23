@@ -1,6 +1,6 @@
 import { FunctionNode, INode, Node } from './Parser';
 type ReturnTypes = "Int" | "Float" | "Char" | "Bool" | "String" | "Void"
-
+type ParameterLength = number | "Infinite";
 export class AvoVariable
 {
     name: string;
@@ -11,10 +11,13 @@ export class AvoFunction
 {
     returnType: string;
     callback: (...a: any) => any;
-    constructor(callback: (...a: any) => any, returnType: ReturnTypes)
+    pLength: ParameterLength;
+
+    constructor(callback: (...a: any) => any, returnType: ReturnTypes, parameterLength : ParameterLength)
     {
         this.callback = callback;
         this.returnType = returnType;
+        this.pLength = parameterLength;
     }
 
     call(args: any[])
@@ -126,6 +129,12 @@ export class Scope
     {
         if (node.value in this.functions)
         {
+            let func = this.functions[node.value];
+            if (!(func.pLength == "Infinite" || func.pLength == node.params.length)) 
+            {
+                this.scream(`PARAMETER LENGTH MISMATCH EXPECTED ${func.pLength} RECIEVED ${node.params.length}`)
+            }
+
             let result = this.functions[node.value].call(node.params.map(v =>
             {
                 return this.eval_node(v).value;

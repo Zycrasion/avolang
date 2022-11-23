@@ -63,7 +63,7 @@ const is = {
         },
         tail(char : string) : boolean
         {
-            return is.identifier.start(char) || is.digit(char) || "_$".includes(char);
+            return is.identifier.start(char) || is.digit(char) || "_$.".includes(char);
         }
     },
     keyword(word : string) : boolean

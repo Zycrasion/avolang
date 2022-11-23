@@ -1,5 +1,5 @@
 import { check } from "./ParseTests.js";
-import { Token } from "./Tokeniser.js";
+import { FunctionCallToken, Token, Tokeniser } from "./Tokeniser.js";
 export class Parser
 {
     private tokens: Token[];
@@ -133,19 +133,6 @@ export class Parser
             throw new Error("ERROR NOT ID", { cause: token })
         }
 
-        if (this.peek().value == ".")
-        {
-            this.next();
-            let funcOrVar = this.parse_id(this.next());
-            funcOrVar.value = token.value + "." + funcOrVar.value;
-            return funcOrVar;
-        }
-
-        if (this.peek().value == "(")
-        {
-            return FunctionNode.create("FunctionCall", token.value, this.parse_delimited("(", ",", ")"))
-        }
-
         return Node.createLeaf("Identifier", token.value);
     }
 
@@ -199,12 +186,44 @@ export class Parser
         return nodes;
     }
 
+    parse_func(token : FunctionCallToken) : FunctionNode
+    {
+        let seperated : Token[][] = [[]];
+        for (let t of token.params)
+        {   
+            if (t.value == ",")
+            {
+                seperated.push([]);
+            } else 
+            {
+                seperated[seperated.length - 1].push(t);
+            }
+        }
+
+        let params : INode[] = [];
+        for (let nested of seperated)
+        {
+            let parser = new Parser(nested);
+            let nodes = parser.read() ;
+            params.push(...nodes);
+        }
+
+        return FunctionNode.create(
+            "FunctionCall",
+            token.value,
+            params
+        )
+    }
+
     parse_token(token: Token = this.current): INode
     {
         switch (token.type)
         {
             case "keyword":
                 return this.parse_keyword(token);
+
+            case "FunctionCall":
+                return this.parse_func(token as FunctionCallToken);
 
             case "punc":
                 break;
