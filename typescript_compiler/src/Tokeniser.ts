@@ -2,8 +2,8 @@ import is from "./charTests.js";
 
 interface IToken
 {
-    type : string;
-    value : any;
+    type: string;
+    value: any;
 }
 
 export class Token implements IToken
@@ -26,9 +26,9 @@ export class FunctionCallToken implements IToken
 {
     type: string;
     value: any;
-    params : Token[];
+    params: Token[];
 
-    static create(name : any, params : Token[]) : FunctionCallToken
+    static create(name: any, params: Token[]): FunctionCallToken
     {
         let a = new FunctionCallToken();
         a.type = "FunctionCall";
@@ -43,11 +43,11 @@ export class FunctionDeclarationToken implements IToken
 {
     type: string;
     value: any;
-    params : Token[];
-    body : Token[];
-    return_type : Token;
+    params: Token[];
+    body: Token[];
+    return_type: Token;
 
-    static create(name : any, params : Token[], body : Token[], return_type : Token) : FunctionDeclarationToken
+    static create(name: any, params: Token[], body: Token[], return_type: Token): FunctionDeclarationToken
     {
         let a = new FunctionDeclarationToken();
         a.type = "FunctionDeclaration";
@@ -106,11 +106,6 @@ export class Tokeniser
 
         this.putback();
 
-        if (is.keyword(id) && id == "func")
-        {
-            return this.read_func_decl();
-        }
-
         return Token.create(
             is.keyword(id) ? "keyword" : "identifier",
             id
@@ -147,87 +142,46 @@ export class Tokeniser
         return str;
     }
 
-    assure_type(type : string)
+    assure_type(type: string)
     {
-        let tok = this.read_token(null, () => {});
+        let tok = this.read_token(null, () => { });
         if (tok.type != type)
         {
-            throw new Error("EXPECTED TOKEN TYPE OF ".concat(type, " GOT ", tok.type, "  ", JSON.stringify(tok)), {cause : JSON.stringify(tok)});
+            throw new Error("EXPECTED TOKEN TYPE OF ".concat(type, " GOT ", tok.type, "  ", JSON.stringify(tok)), { cause: JSON.stringify(tok) });
         }
         return tok;
     }
 
-    assure_value(value : string)
+    assure_value(value: string)
     {
-        let tok = this.read_token(null, () => {});
+        let tok = this.read_token(null, () => { });
         if (tok.value != value)
         {
-            throw new Error("EXPECTED TOKEN VALUE OF ".concat(value, " GOT ", tok.value, "  ", JSON.stringify(tok)), {cause : JSON.stringify(tok)});
+            throw new Error("EXPECTED TOKEN VALUE OF ".concat(value, " GOT ", tok.value, "  ", JSON.stringify(tok)), { cause: JSON.stringify(tok) });
         }
         return tok;
     }
 
-    read_func_decl() : IToken
-    {
-
-        // func : void scream ( hi , lol )
-        // {
-        //      out.print("AJJJJJGGG ",hi," ",lol)
-        // }
-        this.putback();
-        console.log(this.current);
-        this.assure_value(":");
-        this.next();
-        let return_type = this.assure_type("keyword");
-        this.next();
-        let name = this.assure_type("identifier");
-        this.assure_value("(");
-        this.next();
-        
-        let paramNames : Token[] = [];
-        let current : Token = this.read_token(null, () => {paramNames.pop()});
-        while (current.value != ")")
-        {
-            paramNames.push(current);
-            this.next();
-            current = this.read_token(current, () => {paramNames.pop()})
-        }
-
-        this.assure_value("{")
-        this.next();
-        let body : IToken[] = []
-        current = this.read_token(null, () => {body.pop()})
-        while (current.value != "}")
-        {
-            body.push(current);
-            this.next();
-            current = this.read_token(current, () => {body.pop()})
-        }
-
-        return FunctionDeclarationToken.create(
-            name,
-            paramNames,
-            body,
-            return_type
-        );
-    }
-
-    read_func_call(FuncIdentifer : Token) : IToken
+    read_func_call(FuncIdentifer: Token): IToken
     {
         let name = FuncIdentifer.value;
-        let params : Token[] = [];
+        let params: Token[] = [];
         let last = Token.create("punc", "(");
         while (this.next() != ")")
         {
-            params.push(this.read_token(last, () => {params.pop()}));
+            params.push(this.read_token(last, () => { params.pop() }));
             last = params[params.length - 1];
         }
-        return FunctionCallToken.create(name, params);
+        let a = FunctionCallToken.create(name, params)
+        return a;
     }
 
-    read_token(last : Token, remove_last : () => void) : IToken
+    read_token(last: Token, remove_last: () => void): IToken
     {
-        if (this.current == " ") {this.next()}
+        while ([" ","\t","\n"].includes(this.current))
+        {
+            this.next();
+        }
         if (this.current == "'" || this.current == '"')
         {
             return Token.create(this.current == '"' ? "string" : "char", this.read_until(this.current))
@@ -236,8 +190,10 @@ export class Tokeniser
         {
             if (this.current == "(" && last.type == "identifier")
             {
+                // throw new Error("STACK TRACE")
                 remove_last();
-                return this.read_func_call(last);
+                let b = this.read_func_call(last);
+                return b;
             }
             return Token.create("punc", this.current);
         } else if (is.identifier.start(this.current))
@@ -250,6 +206,7 @@ export class Tokeniser
         {
             return this.read_num();
         }
+        console.log(this.current, "null")
         return null;
     }
 
@@ -273,7 +230,7 @@ export class Tokeniser
                 curr = this.read_token(null, remove_last);
             } else 
             {
-                curr = this.read_token(tokens[tokens.length - 1], remove_last);
+                curr = this.read_token(tokens[tokens.length - 1], () => { remove_last() });
             }
 
             if (curr == null)
@@ -281,20 +238,25 @@ export class Tokeniser
                 continue;
             } else 
             {
+                if (curr.value=="scream")
+                {
+                    console.log(curr);
+                }
+                console.log(JSON.stringify(tokens[tokens.length - 1]), " last curr: ",JSON.stringify(curr))
                 tokens.push(curr);
             }
         }
         return tokens;
     }
-    
+
     /**
      * utility function for ```convert_to_pn()```
      * @param expr_stack stack to compute polish notation for
      * @returns 
      */
-    private pn_parse_stack(expr_stack : IToken[]) : IToken[]
+    private pn_parse_stack(expr_stack: IToken[]): IToken[]
     {
-        let pn : IToken[] = [];
+        let pn: IToken[] = [];
         if (expr_stack.length > 1 && expr_stack[1].type == "operator")
         {
             pn.push(expr_stack[1], expr_stack[0], ...this.pn_parse_stack(expr_stack.slice(2)));
@@ -310,11 +272,11 @@ export class Tokeniser
      * Converts tokens to polish notation
      * @param tokens Tokens to convert to polish notation
      */
-    convert_to_pn(tokens : IToken[])
+    convert_to_pn(tokens: IToken[])
     {
-        let pn : IToken[] = [];
+        let pn: IToken[] = [];
         // 2, -, 3
-        let expr_stack : IToken[] = [];
+        let expr_stack: IToken[] = [];
         // - 2 3
         for (let index = 0; index < tokens.length; index++)
         {
@@ -336,16 +298,16 @@ export class Tokeniser
                 default:
                     if (expr_stack.length > 0)
                     {
-                        pn.push(...this.pn_parse_stack(expr_stack));  
-                        expr_stack = [];    
+                        pn.push(...this.pn_parse_stack(expr_stack));
+                        expr_stack = [];
                     }
                     pn.push(current)
             }
         }
         if (expr_stack.length > 0)
         {
-            pn.push(...this.pn_parse_stack(expr_stack));  
-            expr_stack = [];    
+            pn.push(...this.pn_parse_stack(expr_stack));
+            expr_stack = [];
         }
         return pn;
     }
