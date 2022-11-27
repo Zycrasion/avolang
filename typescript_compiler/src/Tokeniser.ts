@@ -96,6 +96,15 @@ export class Tokeniser
         return this.current = this.content.at(this.index++);
     }
 
+    read_kw(id: string)
+    {
+
+        return Token.create(
+            "keyword",
+            id
+        )
+    }
+
     read_id()
     {
         let id = this.current;
@@ -106,8 +115,13 @@ export class Tokeniser
 
         this.putback();
 
+        if (is.keyword(id))
+        {
+            return this.read_kw(id);
+        }
+
         return Token.create(
-            is.keyword(id) ? "keyword" : "identifier",
+            "identifier",
             id
         )
     }
@@ -178,7 +192,7 @@ export class Tokeniser
 
     read_token(last: Token, remove_last: () => void): IToken
     {
-        while ([" ","\t","\n"].includes(this.current))
+        while ([" ", "\t", "\n"].includes(this.current))
         {
             this.next();
         }
@@ -191,6 +205,7 @@ export class Tokeniser
             if (this.current == "(" && last.type == "identifier")
             {
                 // throw new Error("STACK TRACE")
+                console.log(last, this.current)
                 remove_last();
                 let b = this.read_func_call(last);
                 return b;
@@ -238,11 +253,6 @@ export class Tokeniser
                 continue;
             } else 
             {
-                if (curr.value=="scream")
-                {
-                    console.log(curr);
-                }
-                console.log(JSON.stringify(tokens[tokens.length - 1]), " last curr: ",JSON.stringify(curr))
                 tokens.push(curr);
             }
         }

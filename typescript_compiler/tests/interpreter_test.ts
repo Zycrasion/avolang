@@ -23,7 +23,7 @@ function main()
     } 
 
     var:int random_variable = rand.randint(5);
-    out.print("TESTING POLISH NOTATION")
+    out.print("TESTING POLISH NOTATION");
     out.print(3 * 2 + 1 / 2);
     out.print(random_variable * 2, random_variable);
     out.print(rand.randint(5) * 2, 2 * rand.randint(10))
