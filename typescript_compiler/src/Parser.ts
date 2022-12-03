@@ -1,5 +1,5 @@
 import { check } from "./ParseTests.js";
-import { FunctionCallToken, Token, Tokeniser } from "./Tokeniser.js";
+import { FunctionCallToken, Token, Tokeniser } from "./Tokeniser_old.js";
 export class Parser
 {
     private tokens: Token[];

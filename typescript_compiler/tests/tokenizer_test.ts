@@ -1,5 +1,5 @@
 import { Parser } from "../src/Parser.js";
-import { Tokeniser } from "../src/Tokeniser.js";
+import { Tokeniser } from "../src/Tokeniser_old.js";
 
 function repeat(times : number, str : string | number) : string
 {

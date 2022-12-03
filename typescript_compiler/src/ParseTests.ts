@@ -1,4 +1,4 @@
-import { Token } from "./Tokeniser.js";
+import { Token } from "./Tokeniser_old.js";
 
 export let check = {
     op(tok : Token)
