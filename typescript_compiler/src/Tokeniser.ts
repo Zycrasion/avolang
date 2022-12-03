@@ -1,36 +1,38 @@
 import is from "./charTests.js";
-import { IdentifierToken, IToken, KeywordToken, OperatorToken, PunctuationToken, ValueToken, ValueTypes } from "./TokenTypes.js";
+import { AssertType, AssertValue, FunctionCallToken, IdentifierToken, isIdentiferToken, isIdentifierDerativeToken, isPunctuationToken, IToken, KeywordToken, OperatorToken, PunctuationToken, ValueToken, ValueTypes } from "./TokenTypes.js";
 
 class Tokeniser
 {
-    content : string[];
-    p1_index : number;
-    pass1 : IToken[];
-    pass2 : IToken[];
-    final : IToken[];
+    content: string[];
+    p1_index: number;
+    pass1: IToken[];
+    p2_index: number;
+    pass2: IToken[];
+    final: IToken[];
 
-    constructor(content : string)
+    constructor(content: string)
     {
         this.content = content.split("");
         this.p1_index = 0;
+        this.p2_index = 0;
     }
 
-    private P1_Current() : string
+    private P1_Current(): string
     {
         return this.content.at(this.p1_index);
     }
 
-    private P1_Peek() : string
+    private P1_Peek(): string
     {
         return this.content.at(this.p1_index + 1);
     }
 
-    private P1_Next() : string
+    private P1_Next(): string
     {
-        return this.content.at( ++ this.p1_index);
+        return this.content.at(++this.p1_index);
     }
 
-    private P1_ParseNum(curr : string) : ValueToken
+    private P1_ParseNum(curr: string): ValueToken
     {
         let numStr = curr;
         let isFloat = false;
@@ -39,7 +41,7 @@ class Tokeniser
         {
             if (next == ".")
             {
-                if (isFloat) {break;}
+                if (isFloat) { break; }
                 isFloat = true;
                 numStr = numStr.concat(next);
             } else 
@@ -53,23 +55,25 @@ class Tokeniser
         }
 
         let num = parseFloat(numStr);
-        let type : ValueTypes = isFloat ? "Float" : "Int";
-        
+        let type: ValueTypes = isFloat ? "Float" : "Int";
+
         return new ValueToken(
             type,
             num
         )
     }
 
-    private P1_ParseId(curr : string) : IdentifierToken | KeywordToken
+    private P1_ParseId(curr: string): IdentifierToken | KeywordToken
     {
         let id = curr;
         let next = this.P1_Next();
         while (is.identifier.tail(next))
         {
             id = id.concat(next);
-            next = this.P1_Next();
+            next = this.P1_Peek();
+            this.P1_Next();
         }
+        this.p1_index--;
 
         if (is.keyword(id))
         {
@@ -78,7 +82,7 @@ class Tokeniser
         return new IdentifierToken(id);
     }
 
-    private P1_ParseAtom(curr : string) : IToken
+    private P1_ParseAtom(curr: string): IToken
     {
         if (curr.length != 1)
         {
@@ -106,8 +110,12 @@ class Tokeniser
         }
         return null;
     }
-    
-    RunPass1() : IToken[]
+
+    /**
+     * Groups strings together into basic groups
+     * @returns Tokens
+     */
+    RunPass1(): IToken[]
     {
         this.pass1 = [];
         while (this.P1_Current() !== undefined)
@@ -122,9 +130,75 @@ class Tokeniser
         return this.pass1;
     }
 
+
+    private P2_Current(): IToken
+    {
+        return this.pass1.at(this.p2_index);
+    }
+
+    private P2_Peek(): IToken
+    {
+        return this.pass1.at(this.p2_index + 1);
+    }
+
+    private P2_Next(): IToken
+    {
+        return this.pass1.at(++this.p2_index);
+    }
+
+    private P2_ScanFunctionCall(curr: IdentifierToken): FunctionCallToken
+    {
+        let name = curr.value;
+        let params: IToken[] = [];
+        this.P2_Next();
+        let next = this.P2_Next();
+        loop: while (next !== undefined)
+        {
+            if (isPunctuationToken(next))
+            {
+                if (next.value === ")") break;
+                if (next.value === ",")
+                {
+                    next = this.P2_Next();
+                    continue loop;
+                }
+            }
+            params.push(this.P2_ParseToken(next));
+            next = this.P2_Next();
+        }
+        return new FunctionCallToken(
+            name,
+            params
+        )
+    }
+
+    private P2_ParseToken(curr: IToken)
+    {
+        if (isIdentiferToken(curr))
+        {
+            let next = this.P2_Peek()
+            if (isPunctuationToken(next) && next.value == "(")
+            {
+                return this.P2_ScanFunctionCall(curr);
+            }
+        }
+        return curr;
+    }
+
+    /**
+     * Groups Related Tokens Together into more complex tokens
+     * @returns Tokens
+     */
     RunPass2()
     {
-    
+        this.pass2 = [];
+        while (this.P2_Current() !== undefined)
+        {
+            let token = this.P2_ParseToken(this.P2_Current());
+            this.pass2.push(token);
+            this.P2_Next();
+        }
+        return this.pass2;
     }
 
     RunPass3()
@@ -135,13 +209,14 @@ class Tokeniser
     Run()
     {
         this.RunPass1();
+        return this.RunPass2();
     }
 }
 
 {
-    let content = "var : int a = 10 + 10;";
+    let content = "var : int a = 10 + 10 * lol(1,2,3,4);";
     let TokenFactory = new Tokeniser(content);
-    let result = TokenFactory.RunPass1();
+    let result = TokenFactory.Run();
     console.log(
         JSON.stringify(result)
     )

@@ -5,6 +5,26 @@ export interface IToken
 
 export type ValueTypes = "Boolean" | "Int" | "Float" | "String" | "Char";
 
+export function AssertType(tok : IToken, check : (tok : IToken) => boolean, crucial = false)
+{
+    if (!check(tok))
+    {
+        if (!crucial) return false
+        throw new Error("FAILED ASSERTION");
+    }
+    return true;
+}
+
+export function AssertValue(tok : IToken, value : string | number | boolean, crucial = false)
+{
+    if (tok["value"] === value)
+    {
+        return true;
+    }
+    if (!crucial) return false;
+    throw new Error(`Assertion Failed, Expected ${value} Recieved ${tok["value"]}`)
+}
+
 // Value Token
 // eg. "hi" 'hi' true false 19 1.9
 export class ValueToken implements IToken
