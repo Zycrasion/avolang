@@ -149,3 +149,41 @@ export function isFunctionCallToken(tok : IToken) : tok is FunctionCallToken
 {
     return tok.tokenName == "FunctionCallToken";
 }
+
+// Punctuation Tokens
+
+export class PunctuationToken implements IToken
+{
+    tokenName: "PunctuationToken";
+    value : string;
+
+    constructor(value : string)
+    {
+        this.tokenName = "PunctuationToken";
+        this.value = value;
+    }
+}
+
+export function isPunctuationToken(tok : IToken) : tok is PunctuationToken
+{
+    return tok.tokenName == "PunctuationToken";
+}
+
+// Punctuation Tokens
+
+export class OperatorToken implements IToken
+{
+    tokenName: "OperatorToken";
+    value : string;
+
+    constructor(value : string)
+    {
+        this.tokenName = "OperatorToken";
+        this.value = value;
+    }
+}
+
+export function isOperatorToken(tok : IToken) : tok is OperatorToken
+{
+    return tok.tokenName == "OperatorToken";
+}
