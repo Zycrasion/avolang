@@ -14,7 +14,7 @@ I want the langauge to be human readable while also being easy for an interperet
 ### Variables
 Avolang:
 ```
-var:char char_example  'l';
+var:char char_example = 'l';
 var:int int_example = 10;
 ```
 Typescript:
@@ -26,7 +26,7 @@ as you can see Avolang has stricter types
 ### Functions
 Avolang:
 ```
-func<void> print_AHHHH()
+func:void print_AHHHH()
 {
     out.print("AHHHH");
 }
