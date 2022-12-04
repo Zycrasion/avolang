@@ -1,5 +1,5 @@
 import is from "./charTests.js";
-import { AssertType, AssertValue, FunctionCallToken, IdentifierToken, isIdentiferToken, isIdentifierDerativeToken, isPunctuationToken, IToken, KeywordToken, OperatorToken, PunctuationToken, ValueToken, ValueTypes } from "./TokenTypes.js";
+import { AssertType, AssertValue, FunctionCallToken, IdentifierToken, isIdentiferToken, isIdentifierDerativeToken, isOperatorToken, isPunctuationToken, isValueToken, IToken, KeywordToken, OperatorToken, PunctuationToken, ValueToken, ValueTypes } from "./TokenTypes.js";
 
 class Tokeniser
 {
@@ -8,6 +8,7 @@ class Tokeniser
     pass1: IToken[];
     p2_index: number;
     pass2: IToken[];
+    p3_index: number;
     final: IToken[];
 
     constructor(content: string)
@@ -15,6 +16,7 @@ class Tokeniser
         this.content = content.split("");
         this.p1_index = 0;
         this.p2_index = 0;
+        this.p3_index = 0;
     }
 
     private P1_Current(): string
@@ -201,15 +203,48 @@ class Tokeniser
         return this.pass2;
     }
 
+    private P3_ParseExpression(slice : IToken[]) : IToken[]
+    {
+        let num1 = slice[0]
+        let operator = slice[1];
+        let expr2 = slice.slice(2);
+        if (isOperatorToken(operator))
+        {
+            return [operator, num1, ...this.P3_ParseExpression(expr2)]
+        } else 
+        {
+            return [num1];
+        }
+    }
+
+    /**
+     * Converts normal Math into polish notation
+     * @returns Tokens
+     */
     RunPass3()
     {
-
+        this.final = [];
+        for (let i = 0; i < this.pass2.length - 1; i++)
+        {
+            let curr = this.pass2[i];
+            let next = this.pass2[i + 1];
+            if (isOperatorToken(next))
+            {
+                this.final.push(next, curr);
+                i++;
+            } else
+            {
+                this.final.push(curr);
+            }
+        }
+        return this.final;
     }
 
     Run()
     {
         this.RunPass1();
-        return this.RunPass2();
+        this.RunPass2();
+        return this.RunPass3();
     }
 }
 
