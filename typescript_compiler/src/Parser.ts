@@ -1,32 +1,32 @@
-import { check } from "./ParseTests.js";
-import { FunctionCallToken, Token, Tokeniser } from "./Tokeniser_old.js";
+import { FunctionCallToken, isIdentiferToken, isKeywordToken, isPunctuationToken, isValueToken, IToken } from "./TokenTypes.js";
+import { isOperatorToken } from "./TokenTypes.js";
 export class Parser
 {
-    private tokens: Token[];
+    private tokens: IToken[];
 
-    public current: Token;
+    public current: IToken;
     public index: number;
 
-    constructor(tokens: Token[])
+    constructor(tokens: IToken[])
     {
         this.tokens = tokens;
         this.index = 0;
         this.current = tokens[this.index];
     }
 
-    next(): Token
+    next(): IToken
     {
         return this.current = this.tokens.at(this.index++);
     }
 
-    peek(): Token
+    peek(): IToken
     {
         let tok = this.tokens.at(this.index++);
         this.index--;
         return tok;
     }
 
-    putback(): Token
+    putback(): IToken
     {
         return this.current = this.tokens.at(this.index--);
     }
@@ -36,19 +36,24 @@ export class Parser
         return this.index >= this.tokens.length;
     }
 
-    parse_keyword(token: Token = this.current): INode
+    parse_keyword(token: IToken = this.current): INode
     {
+        if (!isKeywordToken(token)) throw new Error("Expected keyword token");
         switch (token.value)
         {
             case "var":
-                if (this.next().value != ":")
+                let colon = this.next()
+                if (!isPunctuationToken(colon)) throw new Error("Expected punc token after var")
+                if (colon.value != ":")
                 {
                     throw new Error("NO : AFTER VAR");
                 } else
                 {
                     let type = this.parse_keyword(this.next());
                     let name = this.grab_id(this.next());
-                    if (this.next().value != "=") { throw new Error("NO =") }
+                    let eq = this.next();
+                    if (!isPunctuationToken(eq)) throw new Error("Expected =");
+                    if (eq.value != "=") { throw new Error("NO =") }
                     let value = this.parse_token(this.next());
 
                     return Node.create(
@@ -82,27 +87,30 @@ export class Parser
         return null;
     }
 
-    parse_num(token: Token = this.current): INode
+    parse_num(token: IToken = this.current): INode
     {
-        return Node.createLeaf(token.type == "float" ? "Float" : "Int", token.value);
+        if (!isValueToken(token)) throw new Error("Expected Value Token");
+        if (!token.isNumber()) throw new Error("Expected Number Token");
+        return Node.createLeaf(token.isFloat() ? "Float" : "Int",  token.value);
     }
 
     /**
      * Parses Polish Notation into AST
      * @param operator Main operator
      */
-    parse_expr(operator: Token = this.current): Node
+    parse_expr(operator: IToken = this.current): Node
     {
+        console.log(operator)
         const op_prec = {
             "+" : 10,
             "-" : 10, 
             "*" : 20,
             "/" : 20
         }
-        if (!check.op(operator)) throw new Error("Parameter passed to parse_expr isn't an operator", {cause: operator});
+        if (!isOperatorToken(operator)) throw new Error("Parameter passed to parse_expr isn't an operator", {cause: operator});
         let op = operator.value;
         let lhs = this.parse_token(this.next());
-        let rhs = this.parse_token(this.next());
+        let rhs = this. parse_token(this.next());
         if (op_prec[rhs.value] < op_prec[op])
         {
             let _op = op;
@@ -126,9 +134,10 @@ export class Parser
         )
     }
 
-    parse_id(token: Token = this.current): INode
+    parse_id(token: IToken = this.current): INode
     {
-        if (token.type != "identifier")
+
+        if (!isIdentiferToken(token))
         {
             throw new Error("ERROR NOT ID", { cause: token })
         }
@@ -136,20 +145,20 @@ export class Parser
         return Node.createLeaf("Identifier", token.value);
     }
 
-    grab_id(token: Token = this.current): string
+    grab_id(token: IToken = this.current): string
     {
-        if (token.type != "identifier")
+        if (!isIdentiferToken(token))
         {
             throw new Error("ERROR NOT ID", { cause: token })
         }
         return token.value;
     }
 
-    parse_string(token: Token = this.current): INode
+    parse_string(token: IToken = this.current): INode
     {
-        if (token.type == "string" || token.type == "char")
+        if (isValueToken(token) && token.isStringType())
         {
-            return Node.createLeaf(token.type == "string" ? "StringLiteral" : "CharLiteral", token.value);
+            return Node.createLeaf(token.isString() ? "StringLiteral" : "CharLiteral", token.value);
         }
         throw new Error("TOKEN NOT STRING OR CHAR");
     }
@@ -157,18 +166,19 @@ export class Parser
     parse_delimited(start: string, separator: string, endString: string): INode[]
     {
         let nodes: INode[] = [];
-        if (this.next().value != start)
+        let starter = this.next();
+        if (!(isPunctuationToken(starter) && starter.value == start))
         {
             throw new Error("UNEXPECTED TOKEN " + JSON.stringify(this.current));
         }
 
 
         loop:
-        while (this.current.value !== endString)
+        while (!(isPunctuationToken(this.current) && this.current.value == endString))
         {
             this.next()
 
-            if (this.current.value == separator)
+            if (isPunctuationToken(this.current) && this.current.value == separator)
             {
                 continue loop;
             }
@@ -188,10 +198,10 @@ export class Parser
 
     parse_func(token : FunctionCallToken) : FunctionNode
     {
-        let seperated : Token[][] = [[]];
+        let seperated : IToken[][] = [[]];
         for (let t of token.params)
         {   
-            if (t.value == ",")
+            if (isPunctuationToken(t) && t.value == ",")
             {
                 seperated.push([]);
             } else 
@@ -210,36 +220,38 @@ export class Parser
 
         return FunctionNode.create(
             "FunctionCall",
-            token.value,
+            token.name,
             params
         )
     }
 
-    parse_token(token: Token = this.current): INode
+    parse_token(token: IToken = this.current): INode
     {
-        switch (token.type)
+        switch (token.tokenName)
         {
-            case "keyword":
+            case "KeywordToken":
                 return this.parse_keyword(token);
 
-            case "FunctionCall":
+            case "FunctionCallToken":
                 return this.parse_func(token as FunctionCallToken);
 
-            case "punc":
+            case "PunctuationToken":
                 break;
 
-            case "identifier":
+            case "IdentifierToken":
                 return this.parse_id(token);
 
-            case "float":
-            case "int":
-                return this.parse_num(token);
+            case "ValueToken":
+                if (!isValueToken(token)) throw new Error("This Should be impossible");
+                if (token.isNumber())
+                {
+                    return this.parse_num(token);
+                } else if (token.isStringType())
+                {
+                    return this.parse_string(token);
+                }
 
-            case "char":
-            case "string":
-                return this.parse_string(token);
-
-            case "operator":
+            case "OperatorToken":
                 return this.parse_expr(token);
 
             default:

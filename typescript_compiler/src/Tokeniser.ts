@@ -1,7 +1,7 @@
 import is from "./charTests.js";
-import { AssertType, AssertValue, FunctionCallToken, IdentifierToken, isIdentiferToken, isIdentifierDerativeToken, isOperatorToken, isPunctuationToken, isValueToken, IToken, KeywordToken, OperatorToken, PunctuationToken, ValueToken, ValueTypes } from "./TokenTypes.js";
+import { AssertType, AssertValue, FunctionCallToken, IdentifierToken, isFunctionCallToken, isIdentiferToken, isIdentifierDerativeToken, isOperatorToken, isPunctuationToken, isValueToken, IToken, KeywordToken, OperatorToken, PunctuationToken, ValueToken, ValueTypes } from "./TokenTypes.js";
 
-class Tokeniser
+export class Tokeniser
 {
     content: string[];
     p1_index: number;
@@ -84,6 +84,21 @@ class Tokeniser
         return new IdentifierToken(id);
     }
 
+    private P1_ParseString(curr : string) : ValueToken
+    {
+        let txt = "";
+        let next = this.P1_Next();
+        while (next != curr)
+        {
+            txt = txt.concat(next.toString());
+            next = this.P1_Next();
+        }
+        return new ValueToken(
+            curr == "'" ? "Char" : "String",
+            txt
+        )
+    }
+
     private P1_ParseAtom(curr: string): IToken
     {
         if (curr.length != 1)
@@ -94,6 +109,11 @@ class Tokeniser
         if (is.digit(curr))
         {
             return this.P1_ParseNum(curr);
+        }
+
+        if (curr == '"' || curr == "'")
+        {
+            return this.P1_ParseString(curr);
         }
 
         if (is.punctuation(curr))
@@ -159,11 +179,11 @@ class Tokeniser
             if (isPunctuationToken(next))
             {
                 if (next.value === ")") break;
-                if (next.value === ",")
-                {
-                    next = this.P2_Next();
-                    continue loop;
-                }
+                // if (next.value === ",")
+                // {
+                //     next = this.P2_Next();
+                //     continue loop;
+                // }
             }
             params.push(this.P2_ParseToken(next));
             next = this.P2_Next();
@@ -203,18 +223,30 @@ class Tokeniser
         return this.pass2;
     }
 
-    private P3_ParseExpression(slice : IToken[]) : IToken[]
+    private P3_Main(tokens : IToken[])
     {
-        let num1 = slice[0]
-        let operator = slice[1];
-        let expr2 = slice.slice(2);
-        if (isOperatorToken(operator))
+        let final = [];
+        loop: for (let i = 0; i < tokens.length; i++)
         {
-            return [operator, num1, ...this.P3_ParseExpression(expr2)]
-        } else 
-        {
-            return [num1];
+
+            let curr = tokens[i];
+            if (isFunctionCallToken(curr))
+            {
+                curr.params = this.P3_Main(curr.params);
+            }
+            if (i + 1 < tokens.length)
+            {
+                let next = tokens[i + 1];
+                if (isOperatorToken(next))
+                {
+                    final.push(next, curr);
+                    i++;
+                    continue loop;
+                } 
+            }
+            final.push(curr);
         }
+        return final
     }
 
     /**
@@ -223,20 +255,7 @@ class Tokeniser
      */
     RunPass3()
     {
-        this.final = [];
-        for (let i = 0; i < this.pass2.length - 1; i++)
-        {
-            let curr = this.pass2[i];
-            let next = this.pass2[i + 1];
-            if (isOperatorToken(next))
-            {
-                this.final.push(next, curr);
-                i++;
-            } else
-            {
-                this.final.push(curr);
-            }
-        }
+        this.final = this.P3_Main(this.pass2)
         return this.final;
     }
 
@@ -246,13 +265,4 @@ class Tokeniser
         this.RunPass2();
         return this.RunPass3();
     }
-}
-
-{
-    let content = "var : int a = 10 + 10 * lol(1,2,3,4);";
-    let TokenFactory = new Tokeniser(content);
-    let result = TokenFactory.Run();
-    console.log(
-        JSON.stringify(result)
-    )
 }
