@@ -19,6 +19,7 @@ export class Tokeniser
         this.p3_index = 0;
     }
 
+    // TODO: Remove these and replace them
     private P1_Current(): string
     {
         return this.content.at(this.p1_index);
@@ -39,6 +40,7 @@ export class Tokeniser
         let numStr = curr;
         let isFloat = false;
         let next = this.P1_Peek();
+        // TODO: Fix this
         while (is.digit(next) || next == ".")
         {
             if (next == ".")
