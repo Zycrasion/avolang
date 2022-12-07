@@ -1,5 +1,5 @@
 import { AvoFunction, Scope } from "../src/Interpreter.js";
-import { Tokeniser } from "../src/Tokeniser/Tokeniser.js";
+import { Tokenise } from "../src/Tokeniser/Tokeniser.js";
 import { Parser } from "../src/Parser.js";
 
 function repeat(times: number, str: string | number): string
@@ -15,14 +15,13 @@ function repeat(times: number, str: string | number): string
 
 function main()
 {
-    let token = new Tokeniser(`
+    let tokens = Tokenise(`
     var:int random_variable = rand.randint(5);
     out.print("TESTING POLISH NOTATION");
     out.print(3 * 2 + 1 / 2);
     out.print(random_variable * 2, random_variable);
     out.print(rand.randint(5) * 2, 2 * rand.randint(10))
     `);
-    let tokens = token.Result();
     console.log(JSON.stringify(tokens));
 
     let tree = new Parser(tokens);
