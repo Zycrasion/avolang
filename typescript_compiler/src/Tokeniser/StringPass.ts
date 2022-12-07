@@ -6,9 +6,9 @@ export class StringPass implements TokeniserPass
 {
     private index: number;
     private pass: IToken[];
-    private current : string;
-    private content : string[];
-    private hasRun : boolean;
+    private current: string;
+    private content: string[];
+    private hasRun: boolean;
 
     get result()
     {
@@ -19,7 +19,7 @@ export class StringPass implements TokeniserPass
 
     // Utilities
 
-    constructor(content : string)
+    constructor(content: string)
     {
         this.hasRun = false;
         this.content = content.split("");
@@ -44,20 +44,18 @@ export class StringPass implements TokeniserPass
         return this.current = this.content.at(++this.index);
     }
 
-    // TODO
-    private ReadUntil(endString : string, callback : (str : string) => boolean = (str : string) => false)
+    private ReadUntil(endString: string, callback: (str: string) => boolean = (str: string) => false)
     {
         let entire = "";
         while (this.Next() != endString)
         {
-            if (callback(this.current)) {break;}
+            if (callback(this.current)) { break; }
             entire = entire.concat(this.current);
         }
         return entire;
     }
 
-    // TODO
-    private ReadWhile(condition : (str : string) => boolean)
+    private ReadWhile(condition: (str: string) => boolean)
     {
         let entire = "";
         while (condition(this.Peek()))
@@ -72,7 +70,8 @@ export class StringPass implements TokeniserPass
     {
         let isFloat = false;
         let numStr = curr + this.ReadWhile(
-            str => {
+            str =>
+            {
                 if (str == ".")
                 {
                     isFloat = true;
@@ -101,7 +100,7 @@ export class StringPass implements TokeniserPass
         return new IdentifierToken(id);
     }
 
-    private ParseString(curr : string) : ValueToken
+    private ParseString(curr: string): ValueToken
     {
         let txt = this.ReadUntil(curr);
         return new ValueToken(
@@ -112,36 +111,18 @@ export class StringPass implements TokeniserPass
 
     private ParseAtom(curr: string): IToken
     {
-        // REFACTOR
-        if (curr.length != 1)
-        {
-            throw new Error("TOKEN SIZE MUST BE 1");
-        }
+        if (curr.length != 1)   throw new Error("TOKEN SIZE MUST BE 1");
 
-        if (is.digit(curr))
-        {
-            return this.ParseNum(curr);
-        }
+        if (is.digit(curr)) return this.ParseNum(curr);
 
-        if (curr == '"' || curr == "'")
-        {
-            return this.ParseString(curr);
-        }
+        if (curr == '"' || curr == "'") return this.ParseString(curr);
 
-        if (is.punctuation(curr))
-        {
-            return new PunctuationToken(curr);
-        }
+        if (is.identifier.start(curr)) return this.ParseID(curr);
 
-        if (is.operator(curr))
-        {
-            return new OperatorToken(curr);
-        }
+        if (is.punctuation(curr)) return new PunctuationToken(curr);
 
-        if (is.identifier.start(curr))
-        {
-            return this.ParseID(curr);
-        }
+        if (is.operator(curr)) return new OperatorToken(curr);
+
         return null;
     }
 
