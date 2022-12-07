@@ -5,9 +5,9 @@ export class PolishNotationPass implements TokeniserPass
 {
     private index: number;
     private pass: IToken[];
-    private current : IToken;
-    private content : IToken[];
-    private hasRun : boolean;   
+    private current: IToken;
+    private content: IToken[];
+    private hasRun: boolean;
 
     get result()
     {
@@ -16,7 +16,7 @@ export class PolishNotationPass implements TokeniserPass
         return this.pass;
     }
 
-    constructor(content : IToken[])
+    constructor(content: IToken[])
     {
         this.hasRun = false;
         this.content = content;
@@ -43,29 +43,21 @@ export class PolishNotationPass implements TokeniserPass
     private MainDispatch(tokens: IToken[])
     {
         let final = [];
-        loop: for (let i = 0; i < tokens.length; i++)
+        for (let i = 0; i < tokens.length; i++)
         {
-
             let curr = tokens[i];
+            
             if (isFunctionCallToken(curr))
-            {
                 curr.params = this.MainDispatch(curr.params);
-            }
-            if (i + 1 < tokens.length)
-            {
-                let next = tokens[i + 1];
-                if (isOperatorToken(next))
-                {
-                    final.push(next, curr);
-                    i++;
-                    continue loop;
-                }
-            }
+
+            if (i + 1 < tokens.length && isOperatorToken(tokens[i+1]))
+                final.push(tokens[++i])
+
             final.push(curr);
         }
         return final
     }
-    
+
     /**
      * Converts normal Math into polish notation
      * @returns Tokens
