@@ -1,5 +1,5 @@
 import { AvoFunction, Scope } from "../src/Interpreter.js";
-import { Tokeniser } from "../src/Tokeniser.js";
+import { Tokeniser } from "../src/Tokeniser/Tokeniser.js";
 import { Parser } from "../src/Parser.js";
 
 function repeat(times: number, str: string | number): string

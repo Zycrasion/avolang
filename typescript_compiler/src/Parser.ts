@@ -1,5 +1,7 @@
-import { FunctionCallToken, isIdentiferToken, isKeywordToken, isPunctuationToken, isValueToken, IToken } from "./TokenTypes.js";
-import { isOperatorToken } from "./TokenTypes.js";
+import { FunctionCallToken, isIdentiferToken, isKeywordToken, isPunctuationToken, isValueToken, IToken } from "./Tokeniser/TokenTypes.js";
+import { isOperatorToken } from "./Tokeniser/TokenTypes.js";
+
+// TODO: Refactor and rewrite to make more typesafe like Tokeniser
 export class Parser
 {
     private tokens: IToken[];
