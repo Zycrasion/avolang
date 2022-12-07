@@ -45,9 +45,15 @@ export class StringPass implements TokeniserPass
     }
 
     // TODO
-    private ReadUntil(str : string)
+    private ReadUntil(endString : string, callback : () => boolean = () => false)
     {
-
+        let entire = "";
+        while (this.Next() != endString)
+        {
+            if (callback()) {break;}
+            entire = entire.concat(this.current);
+        }
+        return entire;
     }
 
     // TODO
@@ -110,14 +116,7 @@ export class StringPass implements TokeniserPass
 
     private ParseString(curr : string) : ValueToken
     {
-        let txt = "";
-        let next = this.Next();
-        // REFACTOR
-        while (next != curr)
-        {
-            txt = txt.concat(next.toString());
-            next = this.Next();
-        }
+        let txt = this.ReadUntil(curr);
         return new ValueToken(
             curr == "'" ? "Char" : "String",
             txt
