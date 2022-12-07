@@ -68,15 +68,12 @@ export class GroupRelatedPass implements TokeniserPass
 
     private ParseToken(curr: IToken)
     {
-        if (isIdentiferToken(curr))
-        {
-            let next = this.Peek()
-            if (isPunctuationToken(next) && next.value == "(")
-            {
-                return this.ScanFunctionCall(curr);
-            }
-        }
-        return curr;
+        let next = this.Peek()
+
+        if (!isIdentiferToken(curr)) return curr;
+        if (!(isPunctuationToken(next) && next.value == "(")) return curr;
+        
+        return this.ScanFunctionCall(curr);
     }
 
     /**

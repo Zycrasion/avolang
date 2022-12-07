@@ -72,7 +72,7 @@ export class StringPass implements TokeniserPass
         let numStr = curr + this.ReadWhile(
             str =>
             {
-                if (str == ".")
+                if (str == "." && isFloat == false)
                 {
                     isFloat = true;
                 }
