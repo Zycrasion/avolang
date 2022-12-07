@@ -1,20 +1,20 @@
 import is from "../charTests.js";
+import { GroupRelatedPass } from "./GroupRelatedPass.js";
 import { TokeniserPass } from "./Pass.js";
-import { StringPass } from "./Pass1.js";
+import { StringPass } from "./StringPass.js";
 import { AssertType, AssertValue, FunctionCallToken, IdentifierToken, isFunctionCallToken, isIdentiferToken, isIdentifierDerativeToken, isOperatorToken, isPunctuationToken, isValueToken, IToken, KeywordToken, OperatorToken, PunctuationToken, ValueToken, ValueTypes } from "./TokenTypes.js";
 
 export class Tokeniser
 {
     private Pass1: TokeniserPass;
-    p2_index: number;
-    pass2: IToken[];
+    private Pass2: GroupRelatedPass;
     p3_index: number;
     final: IToken[];
 
     constructor(content: string)
     {
         this.Pass1 = new StringPass(content);
-        this.p2_index = 0;
+        this.Pass2 = new GroupRelatedPass(this.Pass1.result);
         this.p3_index = 0;
     }
 
@@ -22,75 +22,7 @@ export class Tokeniser
 
 
     // TODO: Seperate Pass 2
-    private P2_Current(): IToken
-    {
-        return this.Pass1.result.at(this.p2_index);
-    }
-
-    private P2_Peek(): IToken
-    {
-        return this.Pass1.result.at(this.p2_index + 1);
-    }
-
-    private P2_Next(): IToken
-    {
-        return this.Pass1.result.at(++this.p2_index);
-    }
-
-    private P2_ScanFunctionCall(curr: IdentifierToken): FunctionCallToken
-    {
-        let name = curr.value;
-        let params: IToken[] = [];
-        this.P2_Next();
-        let next = this.P2_Next();
-        loop: while (next !== undefined)
-        {
-            if (isPunctuationToken(next))
-            {
-                if (next.value === ")") break;
-                // if (next.value === ",")
-                // {
-                //     next = this.P2_Next();
-                //     continue loop;
-                // }
-            }
-            params.push(this.P2_ParseToken(next));
-            next = this.P2_Next();
-        }
-        return new FunctionCallToken(
-            name,
-            params
-        )
-    }
-
-    private P2_ParseToken(curr: IToken)
-    {
-        if (isIdentiferToken(curr))
-        {
-            let next = this.P2_Peek()
-            if (isPunctuationToken(next) && next.value == "(")
-            {
-                return this.P2_ScanFunctionCall(curr);
-            }
-        }
-        return curr;
-    }
-
-    /**
-     * Groups Related Tokens Together into more complex tokens
-     * @returns Tokens
-     */
-    RunPass2()
-    {
-        this.pass2 = [];
-        while (this.P2_Current() !== undefined)
-        {
-            let token = this.P2_ParseToken(this.P2_Current());
-            this.pass2.push(token);
-            this.P2_Next();
-        }
-        return this.pass2;
-    }
+    
 
     // TODO: Seperate Pass3
     private P3_Main(tokens: IToken[])
@@ -125,14 +57,12 @@ export class Tokeniser
      */
     RunPass3()
     {
-        this.final = this.P3_Main(this.pass2)
+        this.final = this.P3_Main(this.Pass2.result)
         return this.final;
     }
 
-    Run()
+    Result()
     {
-        this.Pass1.Run();
-        this.RunPass2();
         return this.RunPass3();
     }
 }

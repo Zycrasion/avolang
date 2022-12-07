@@ -5,7 +5,7 @@ import { TokeniserPass } from "./Pass.js";
 export class StringPass implements TokeniserPass
 {
     private index: number;
-    private pass1: IToken[];
+    private pass: IToken[];
     private current : string;
     private content : string[];
     private hasRun : boolean;
@@ -14,19 +14,19 @@ export class StringPass implements TokeniserPass
     {
         if (!this.hasRun) this.Run();
         this.hasRun = true;
-        return this.pass1;
+        return this.pass;
     }
 
     // Utilities
 
     constructor(content : string)
     {
+        this.hasRun = false;
         this.content = content.split("");
         this.index = 0;
         this.current = "";
         this.Curr();
-        this.pass1 = [];
-
+        this.pass = [];
     }
 
     private Curr()
@@ -44,13 +44,13 @@ export class StringPass implements TokeniserPass
         return this.current = this.content.at(++this.index);
     }
 
-    
-
+    // TODO
     private ReadUntil(str : string)
     {
 
     }
-    
+
+    // TODO
     private ReadWhile(str : string)
     {
 
@@ -61,7 +61,7 @@ export class StringPass implements TokeniserPass
         let numStr = curr;
         let isFloat = false;
         let next = this.Peek();
-        // TODO: Fix this
+        // REFACTOR
         while (is.digit(next) || next == ".")
         {
             if (next == ".")
@@ -92,6 +92,7 @@ export class StringPass implements TokeniserPass
     {
         let id = curr;
         let next = this.Next();
+        // REFACTOR
         while (is.identifier.tail(next))
         {
             id = id.concat(next);
@@ -111,6 +112,7 @@ export class StringPass implements TokeniserPass
     {
         let txt = "";
         let next = this.Next();
+        // REFACTOR
         while (next != curr)
         {
             txt = txt.concat(next.toString());
@@ -124,6 +126,7 @@ export class StringPass implements TokeniserPass
 
     private ParseAtom(curr: string): IToken
     {
+        // REFACTOR
         if (curr.length != 1)
         {
             throw new Error("TOKEN SIZE MUST BE 1");
@@ -162,17 +165,17 @@ export class StringPass implements TokeniserPass
      */
     Run(): IToken[]
     {
-        this.pass1 = [];
+        // REFACTOR
+        this.pass = [];
         while (this.current !== undefined)
         {
             let token = this.ParseAtom(this.current);
             if (token != null)
             {
-                this.pass1.push(token);
+                this.pass.push(token);
             }
             this.Next();
         }
-        console.log(JSON.stringify(this.pass1));
-        return this.pass1;
+        return this.pass;
     }
 }

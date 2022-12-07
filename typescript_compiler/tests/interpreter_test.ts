@@ -22,7 +22,7 @@ function main()
     out.print(random_variable * 2, random_variable);
     out.print(rand.randint(5) * 2, 2 * rand.randint(10))
     `);
-    let tokens = token.Run();
+    let tokens = token.Result();
     console.log(JSON.stringify(tokens));
 
     let tree = new Parser(tokens);
