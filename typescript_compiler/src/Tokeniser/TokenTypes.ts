@@ -25,6 +25,11 @@ export function AssertValue(tok : IToken, value : string | number | boolean, cru
     throw new Error(`Assertion Failed, Expected ${value} Recieved ${tok["value"]}`)
 }
 
+export function HasValue(v : IToken) : v is {tokenName : string, value : string}
+{
+    return v["value"] !== undefined;
+}
+
 // Value Token
 // eg. "hi" 'hi' true false 19 1.9
 export class ValueToken implements IToken
