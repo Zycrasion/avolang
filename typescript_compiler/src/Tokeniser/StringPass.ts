@@ -132,7 +132,6 @@ export class StringPass implements TokeniserPass
      */
     Run(): IToken[]
     {
-        // REFACTOR
         this.pass = [];
         while (this.current !== undefined)
         {
