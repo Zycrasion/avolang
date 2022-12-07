@@ -45,45 +45,41 @@ export class StringPass implements TokeniserPass
     }
 
     // TODO
-    private ReadUntil(endString : string, callback : () => boolean = () => false)
+    private ReadUntil(endString : string, callback : (str : string) => boolean = (str : string) => false)
     {
         let entire = "";
         while (this.Next() != endString)
         {
-            if (callback()) {break;}
+            if (callback(this.current)) {break;}
             entire = entire.concat(this.current);
         }
         return entire;
     }
 
     // TODO
-    private ReadWhile(str : string)
+    private ReadWhile(condition : (str : string) => boolean)
     {
-
+        let entire = "";
+        while (condition(this.Peek()))
+        {
+            this.Next();
+            entire = entire.concat(this.current);
+        }
+        return entire;
     }
 
     private ParseNum(curr: string): ValueToken
     {
-        let numStr = curr;
         let isFloat = false;
-        let next = this.Peek();
-        // REFACTOR
-        while (is.digit(next) || next == ".")
-        {
-            if (next == ".")
-            {
-                if (isFloat) { break; }
-                isFloat = true;
-                numStr = numStr.concat(next);
-            } else 
-            {
-                // Its a number
-                numStr = numStr.concat(next);
+        let numStr = curr + this.ReadWhile(
+            str => {
+                if (str == ".")
+                {
+                    isFloat = true;
+                }
+                return is.digit(str) || str == "."
             }
-
-            this.Next();
-            next = this.Peek();
-        }
+        );
 
         let num = parseFloat(numStr);
         let type: ValueTypes = isFloat ? "Float" : "Int";
@@ -96,16 +92,7 @@ export class StringPass implements TokeniserPass
 
     private ParseID(curr: string): IdentifierToken | KeywordToken
     {
-        let id = curr;
-        let next = this.Next();
-        // REFACTOR
-        while (is.identifier.tail(next))
-        {
-            id = id.concat(next);
-            next = this.Peek();
-            this.Next();
-        }
-        this.index--;
+        let id = curr + this.ReadWhile(is.identifier.tail);
 
         if (is.keyword(id))
         {
