@@ -1,9 +1,9 @@
+import { AvoTypes } from "../AvoGlobals";
+
 export interface IToken
 {
     tokenName : string;
 }
-
-export type ValueTypes = "Boolean" | "Int" | "Float" | "String" | "Char";
 
 export function AssertType(tok : IToken, check : (tok : IToken) => boolean, crucial = false)
 {
@@ -35,10 +35,10 @@ export function HasValue(v : IToken) : v is {tokenName : string, value : string}
 export class ValueToken implements IToken
 {
     tokenName: "ValueToken";
-    type: ValueTypes;
+    type: AvoTypes;
     value: string | number | boolean;
 
-    constructor(type : ValueTypes , value : string | number | boolean)
+    constructor(type : AvoTypes , value : string | number | boolean)
     {
         this.tokenName = "ValueToken";
         this.type = type;
@@ -93,10 +93,10 @@ export class VariableDeclarationToken implements IToken
 {
     tokenName: "VariableDeclarationToken";
     name : string;
-    type : ValueTypes;
+    type : AvoTypes;
     value : ValueToken;
 
-    constructor(name : string, type : ValueTypes, value : ValueToken)
+    constructor(name : string, type : AvoTypes, value : ValueToken)
     {
         this.tokenName = "VariableDeclarationToken";
         this.name = name;

@@ -1,7 +1,7 @@
 import is from "../charTests.js";
-import { IdentifierToken, IToken, KeywordToken, OperatorToken, PunctuationToken, ValueToken, ValueTypes } from "./TokenTypes.js";
+import { IdentifierToken, IToken, KeywordToken, OperatorToken, PunctuationToken, ValueToken } from "./TokenTypes.js";
 import { TokeniserPass } from "./Pass.js";
-
+import { AvoTypes } from "../AvoGlobals.js";
 export class StringPass implements TokeniserPass
 {
     private index: number;
@@ -81,7 +81,7 @@ export class StringPass implements TokeniserPass
         );
 
         let num = parseFloat(numStr);
-        let type: ValueTypes = isFloat ? "Float" : "Int";
+        let type: AvoTypes = isFloat ? "Float" : "Int";
 
         return new ValueToken(
             type,

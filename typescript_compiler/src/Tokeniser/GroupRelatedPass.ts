@@ -50,7 +50,6 @@ export class GroupRelatedPass implements TokeniserPass
             if (HasValue(ActiveToken))
             {
                 if (ActiveToken.value == end) break;
-                if (ActiveToken.value == seperator) continue;
             }
 
             parsed.push(this.ParseToken(ActiveToken));
