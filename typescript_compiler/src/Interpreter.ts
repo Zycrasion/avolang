@@ -1,19 +1,15 @@
-import { FunctionNode, INode, Node } from './Parser';
+import { KeywordToAvotype } from "./AvoGlobals.js";
+import { INode, FunctionCallNode, ExpressionNode, VariableDeclarationNode } from "./Parser/NodeTypes.js";
 type ReturnTypes = "Int" | "Float" | "Char" | "Bool" | "String" | "Void"
 type ParameterLength = number | "Infinite";
-export class AvoVariable
-{
-    name: string;
-    type: string;
-    value: any;
-}
+
 export class AvoFunction
 {
     returnType: string;
     callback: (...a: any) => any;
     pLength: ParameterLength;
 
-    constructor(callback: (...a: any) => any, returnType: ReturnTypes, parameterLength : ParameterLength)
+    constructor(callback: (...a: any) => any, returnType: ReturnTypes, parameterLength: ParameterLength)
     {
         this.callback = callback;
         this.returnType = returnType;
@@ -33,7 +29,7 @@ export class AvoFunction
 
 interface VariableTable
 {
-    [Name: string]: AvoVariable;
+    [Name: string]: VariableDeclarationNode;
 }
 
 interface FunctionTable
@@ -89,20 +85,24 @@ export class Scope
     {
         if (id in this.variables)
         {
-            return { type: this.variables[id].type, value: this.variables[id].value };
+            return { type: KeywordToAvotype(this.variables[id].type), value: this.variables[id].value };
         } else 
         {
             return null;
         }
     }
 
-    eval_expr(node: Node): { type: string, value: number }
+    eval_expr(node: ExpressionNode): { type: string, value: number }
     {
-
-        let op = node.value;
-        let left = this.eval_node(node.left as Node);
-        let right = this.eval_node(node.right as Node);
-        if (left.type != right.type) this.scream("TYPE MISMATCH");
+        let op = node.operator
+        if (node.left == undefined || node.right == undefined)
+        {
+            console.log(node);
+            throw new Error("EXPRESSION IS BINARY, UNARY EXPRESSION PROVIDED")
+        }
+        let left = this.eval_node(node.left);
+        let right = this.eval_node(node.right);
+        if (left.type != right.type) this.scream(`EXPRESSION TYPE MISMATCH BETWEEN ${left.type} and ${right.type}`);
         let result = 0;
         switch (op)
         {
@@ -125,21 +125,23 @@ export class Scope
     }
 
     // i know specifying return type like this is bad practice but im lazy
-    eval_function_call(node: FunctionNode): { type: string, value: number }
+    eval_function_call(node: FunctionCallNode): { type: string, value: number }
     {
-        if (node.value in this.functions)
+        if (node.name in this.functions)
         {
-            let func = this.functions[node.value];
+            let func = this.functions[node.name];
             if (!(func.pLength == "Infinite" || func.pLength == node.params.length)) 
             {
                 this.scream(`PARAMETER LENGTH MISMATCH EXPECTED ${func.pLength} RECIEVED ${node.params.length}`)
             }
 
-            let result = this.functions[node.value].call(node.params.map(v =>
+            let result = this.functions[node.name].call(node.params.map(v =>
             {
-                return this.eval_node(v).value;
+                let _ = this.eval_node(v).value
+                console.log(_)
+                return _;
             }));
-            return { type: this.functions[node.value].returnType, value: result}
+            return { type: this.functions[node.name].returnType, value: result }
         }
         else 
         {
@@ -147,50 +149,32 @@ export class Scope
         }
     }
 
-    eval_node(node: INode = this.current): { type: string, value: number }
+    eval_node(node: INode = this.current): { type: string, value: any }
     {
-        if (node==null) 
+        if (node == null) 
         {
             this.scream("NULL TOKEN");
         }
-        switch (node.type)
+        if (INode.isFunctionCallNode(node))
+            return this.eval_function_call(node);
+
+        if (INode.isExpressionNode(node))
+            return this.eval_expr(node);
+
+        if (INode.isValueNode(node))
+            return { type: node.type, value: node.value };
+
+        if (INode.isIdentifierNode(node))
+            return this.grab_id(node.id);
+
+        if (INode.isVariableDeclarationNode(node))
         {
-            case "FunctionCall":
-                return this.eval_function_call(node as FunctionNode);
-
-            case "Expression":
-                return this.eval_expr(node as Node);
-
-            case "Int":
-            case "Float":
-            case "CharLiteral":
-            case "Char":
-            case "Bool":
-            case "String":
-            case "StringLiteral":
-                return { type: node.type, value: node.value };
-
-            case "Identifier":
-                return this.grab_id(node.value);
-
-            case "VariableDeclaration":
-                let VariableRaw = (this.current as Node);
-
-                let Variable = new AvoVariable();
-
-                Variable.type = VariableRaw.left.value;
-                Variable.name = VariableRaw.value;
-
-                let value = this.eval_node(VariableRaw.right) as { type: string, value: any };
-                if (value.type != Variable.type) this.scream(["TYPE MISMATCH", value.type, Variable.type].join(" "))
-                Variable.value = value.value;
-
-                this.variables[this.current.value] = Variable;
-                return { type: Variable.type, value: Variable.value }
-
-            default:
-                this.scream("UNRECOGNISED TOKEN ".concat(JSON.stringify(node)))
+            let Variable: VariableDeclarationNode = node;
+            this.variables[Variable.name] = Variable;
+            return { type: Variable.type, value: Variable.value }
         }
+
+        this.scream("UNRECOGNISED TOKEN ".concat(JSON.stringify(node)))
     }
 
     walk()

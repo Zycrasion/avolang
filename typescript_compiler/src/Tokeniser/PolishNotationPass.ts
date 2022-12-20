@@ -40,10 +40,24 @@ export class PolishNotationPass implements TokeniserPass
         return this.current = this.content.at(++this.index);
     }
 
+    private P3_ParseExpression(slice : IToken[]) : IToken[]
+    {
+        let num1 = slice[0]
+        let operator = slice[1];
+        let expr2 = slice.slice(2);
+        if (operator != undefined && isOperatorToken(operator))
+        {
+            return [operator, num1, ...this.P3_ParseExpression(expr2)]
+        } else 
+        {
+            return [num1];
+        }
+    }
+
     private MainDispatch(tokens: IToken[])
     {
         let final = [];
-        for (let i = 0; i < tokens.length; i++)
+        for (let i = 0; i < tokens.length; i = final.length)
         {
             let curr = tokens[i];
             
@@ -51,9 +65,12 @@ export class PolishNotationPass implements TokeniserPass
                 curr.params = this.MainDispatch(curr.params);
 
             if (i + 1 < tokens.length && isOperatorToken(tokens[i+1]))
-                final.push(tokens[++i])
-
-            final.push(curr);
+            {
+                final.push(...this.P3_ParseExpression(tokens.slice(i)));
+            } else 
+            {
+                final.push(curr);
+            }
         }
         return final
     }
