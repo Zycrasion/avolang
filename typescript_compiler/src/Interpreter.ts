@@ -137,9 +137,9 @@ export class Scope
 
             let result = this.functions[node.name].call(node.params.map(v =>
             {
-                let _ = this.eval_node(v).value
+                let _ = this.eval_node(v)
                 console.log(_)
-                return _;
+                return _.value;
             }));
             return { type: this.functions[node.name].returnType, value: result }
         }
