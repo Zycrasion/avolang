@@ -1,6 +1,6 @@
 {
   "name": "typescript_compiler",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "main": "tests/tokenizer_test.ts",
   "type": "module",
@@ -8,9 +8,9 @@
     "test": "tests"
   },
   "scripts": {
-    "test_tokens" : "ts-node-esm ./tests/tokenizer_test.ts",
-    "test_scope" : "ts-node-esm ./tests/interpreter_test.ts",
-    "unit_tests" : "ts-node-esm ./tests/unit_tests.ts"
+    "test_tokens": "ts-node-esm ./tests/tokenizer_test.ts",
+    "test_scope": "ts-node-esm ./tests/interpreter_test.ts",
+    "unit_tests": "ts-node-esm ./tests/unit_tests.ts"
   },
   "author": "",
   "license": "ISC",
