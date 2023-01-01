@@ -1,4 +1,4 @@
-import { AvoFunction, Scope } from "../src/Interpreter.js";
+import { RunAvo } from "../src/Interpreter/Interpreter.js"
 import { Tokenise } from "../src/Tokeniser/Tokeniser.js";
 import { Parser } from "../src/Parser/Parser.js";
 import { HasValue } from "../src/Tokeniser/TokenTypes.js";
@@ -18,34 +18,17 @@ function main()
 {
     let tokens = Tokenise(`
     var:int random_variable = rand.randint(5);
-    out.print("TESTING POLISH NOTATION");
-    out.print(3 * 2 + 1 / 2);
-    out.print(random_variable * 2, random_variable);
-    out.print(rand.randint(5) * 2, 2 * rand.randint(10))
+    io.println("TESTING POLISH NOTATION");
+    io.println(3 * 2 + 1 / 2);
+    io.println(random_variable * 2);
+    io.println(rand.randint(5) * 2)
     `);
     console.log(JSON.stringify(tokens));
     let tree = new Parser(tokens);
     let nodes = tree.read();
     console.log(JSON.stringify(nodes));
 
-    let scope = new Scope(nodes);
-
-    scope.functions["out.print"] = new AvoFunction((...a: any) =>
-    {
-        console.log(a.join(" "))
-    }, "Void", "Infinite")
-
-    scope.functions["rand.randint"] = new AvoFunction((...a: any) =>
-    {
-        return Math.floor(Math.random() * a[0])
-    }, "Int", 1)
-
-    scope.functions["rand.randfloat"] = new AvoFunction((...a: any) =>
-    {
-        return Math.random() * a[0]
-    }, "Float", 1)
-
-    scope.walk();
+    RunAvo(nodes);
 
     // console.log(repeat(50, "=").concat("FINISHED PROGRAM").concat(repeat(50, "=")))
     // console.log(JSON.stringify(nodes));

@@ -1,6 +1,6 @@
 import { KeywordNode } from "./Parser/NodeTypes";
 
-export type AvoTypes = "Boolean" | "Int" | "Float" | "String" | "Char";
+export type AvoTypes = "Boolean" | "Int" | "Float" | "String" | "Char" | "Void";
 export function KeywordToAvotype(kw : String)
 {
     let _ = kw.split("");
