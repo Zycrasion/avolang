@@ -56,9 +56,9 @@ export class VariableDeclarationNode implements INode
     nodeName = "VariableDeclaration";
     name : string;
     type : AvoTypes;
-    value : ValueNode;
+    value : INode;
 
-    constructor(type : AvoTypes, name : string, value : ValueNode)
+    constructor(type : AvoTypes, name : string, value : INode)
     {
         this.type = type;
         this.name = name;

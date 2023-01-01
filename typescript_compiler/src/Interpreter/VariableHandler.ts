@@ -1,6 +1,6 @@
-import { AvoTypes } from "../AvoGlobals.js";
+import { AvoTypes, KeywordToAvotype } from "../AvoGlobals.js";
 import { IdentifierNode, INode, KeywordNode, VariableDeclarationNode } from "../Parser/NodeTypes.js";
-import { AvoReturn, Scope } from "./Interpreter.js";
+import { AvoReturn, EvaluateNode, Scope } from "./Interpreter.js";
 import { EvaluateValue } from "./ValueHandler.js";
 
 export interface AvoVariable
@@ -29,8 +29,10 @@ export function EvaluateKeyword(node : KeywordNode, scope : Scope) : AvoReturn
 export function EvaluateVariableDeclaration(node : VariableDeclarationNode, scope : Scope) : AvoReturn
 {
     let name = node.name;
-    let type = node.type;
-    let value = EvaluateValue(node.value, scope);
+    let type = KeywordToAvotype(node.type);
+    let valueRaw = EvaluateNode(node.value, scope);
+    let value = valueRaw.value;
+    if (type !== valueRaw.type) throw new Error(`MISMATCHED TYPES ON VARIABLE DECLARATION: ${name}`)
 
     let variable = scope.Variables[name] = {
         type,

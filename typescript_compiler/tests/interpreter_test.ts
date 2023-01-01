@@ -20,13 +20,11 @@ function main()
     var:int random_variable = rand.randint(5);
     io.println("TESTING POLISH NOTATION");
     io.println(3 * 2 + 1 / 2);
-    io.println(random_variable * 2);
+    io.println(random_variable );
     io.println(rand.randint(5) * 2)
     `);
-    console.log(JSON.stringify(tokens));
     let tree = new Parser(tokens);
     let nodes = tree.read();
-    console.log(JSON.stringify(nodes));
 
     RunAvo(nodes);
 
