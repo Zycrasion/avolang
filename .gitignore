@@ -2,6 +2,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,macos,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,macos,node
 
+### debug json files ###
+tree.json
+
 ### macOS ###
 # General
 .DS_Store
@@ -9,7 +12,8 @@
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*

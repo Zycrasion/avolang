@@ -1,3 +1,4 @@
+import { AvoTypes, KeywordToAvotype } from "../AvoGlobals.js";
 import { FunctionCallToken, IdentifierToken, isFunctionCallToken, isIdentiferToken, isKeywordToken, isOperatorToken, isPunctuationToken, isValueToken, IToken, KeywordToken, OperatorToken, ValueToken } from "../Tokeniser/TokenTypes.js";
 import { TokenFilter } from "./Filter.js";
 import { ExpressionNode, FunctionCallNode, IdentifierNode, INode, KeywordNode, ValueNode, VariableDeclarationNode } from "./NodeTypes.js";
@@ -117,7 +118,7 @@ export class Parser
 
         let value = this.parse_token(this.next());
         return new VariableDeclarationNode(
-            type.kw,
+            KeywordToAvotype(type.kw) as AvoTypes,
             name.id,
             value
         )

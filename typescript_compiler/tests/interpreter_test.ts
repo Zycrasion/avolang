@@ -3,6 +3,8 @@ import { Tokenise } from "../src/Tokeniser/Tokeniser.js";
 import { Parser } from "../src/Parser/Parser.js";
 import { HasValue } from "../src/Tokeniser/TokenTypes.js";
 
+import { writeFile } from "fs/promises";
+
 function repeat(times: number, str: string | number): string
 {
     let finalStr: string = "";
@@ -17,6 +19,10 @@ function repeat(times: number, str: string | number): string
 function main()
 {
     let tokens = Tokenise(`
+    {
+        var:int a = 10;
+    }
+    var:int b = a * 2;
     var:int random_variable = rand.randint(5);
     io.println("TESTING POLISH NOTATION");
     io.println(3 * 2 + 1 / 2);
@@ -25,6 +31,7 @@ function main()
     `);
     let tree = new Parser(tokens);
     let nodes = tree.read();
+    writeFile("tree.json", JSON.stringify(nodes));
 
     RunAvo(nodes);
 
