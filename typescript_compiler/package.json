@@ -1,8 +1,8 @@
 {
   "name": "typescript_compiler",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "",
-  "main": "tests/tokenizer_test.ts",
+  "main": "src/CommandLineMain.js",
   "type": "module",
   "directories": {
     "test": "tests"
@@ -10,7 +10,8 @@
   "scripts": {
     "test_tokens": "ts-node-esm ./tests/tokenizer_test.ts",
     "test_scope": "ts-node-esm ./tests/interpreter_test.ts",
-    "unit_tests": "ts-node-esm ./tests/unit_tests.ts"
+    "unit_tests": "ts-node-esm ./tests/unit_tests.ts",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
