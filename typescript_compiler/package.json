@@ -2,7 +2,7 @@
   "name": "typescript_compiler",
   "version": "0.3.0",
   "description": "",
-  "main": "src/CommandLineMain.js",
+  "main": "dist/CommandLineMain.js",
   "type": "module",
   "directories": {
     "test": "tests"
@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^18.11.18",
     "ts-node": "^10.9.1"
   }
 }

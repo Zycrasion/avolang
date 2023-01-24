@@ -48,12 +48,4 @@ let StandardScope: Scope = {
     }
 }
 
-/*
-let streamID = io.outID();
-stream.write(streamID, "Hello!");
-let inputID = io.inputID();
-let str
-stream.get(inputID, )
-*/
-
 export default StandardScope;

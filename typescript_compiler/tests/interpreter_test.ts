@@ -3,7 +3,7 @@ import { Tokenise } from "../src/Tokeniser/Tokeniser.js";
 import { Parser } from "../src/Parser/Parser.js";
 import { HasValue } from "../src/Tokeniser/TokenTypes.js";
 
-import { writeFile } from "fs/promises";
+import { writeFile } from "node:fs/promises";
 
 function repeat(times: number, str: string | number): string
 {
