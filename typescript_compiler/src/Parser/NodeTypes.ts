@@ -31,11 +31,43 @@ export namespace INode
     {
         return node.nodeName == "FunctionCall";
     }
+
+    export function isScopeNode(node : INode) : node is ScopeNode
+    {
+        return node.nodeName == "ScopeNode";
+    }
+
+    export function isXNode<Type extends INode>(node : INode, nodeName : string) : node is Type
+    {
+        return node.nodeName == nodeName;
+    }
 }
 
 export interface INode
 {
     nodeName : string;
+}
+
+export class ScopeNode implements INode
+{
+    nodeName = "ScopeNode";
+    tree : INode[];
+
+    constructor(tree : INode[] = [])
+    {
+        this.tree = tree;
+    }
+
+    push(...items : INode[])
+    {
+        return this.tree.push(...items);
+    }
+
+    pop() : INode
+    {
+        return this.tree.pop()
+    }
+
 }
 
 export class ValueNode implements INode

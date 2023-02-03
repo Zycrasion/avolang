@@ -1,7 +1,7 @@
 import { AvoTypes, KeywordToAvotype } from "../AvoGlobals.js";
-import { FunctionCallToken, IdentifierToken, isFunctionCallToken, isIdentiferToken, isKeywordToken, isOperatorToken, isPunctuationToken, isValueToken, IToken, KeywordToken, OperatorToken, ValueToken } from "../Tokeniser/TokenTypes.js";
+import { FunctionCallToken, IdentifierToken, isFunctionCallToken, isIdentiferToken, isKeywordToken, isOperatorToken, isPunctuationToken, isScopeToken, isValueToken, IToken, KeywordToken, OperatorToken, ScopeToken, ValueToken } from "../Tokeniser/TokenTypes.js";
 import { TokenFilter } from "./Filter.js";
-import { ExpressionNode, FunctionCallNode, IdentifierNode, INode, KeywordNode, ValueNode, VariableDeclarationNode } from "./NodeTypes.js";
+import { ExpressionNode, FunctionCallNode, IdentifierNode, INode, KeywordNode, ScopeNode, ValueNode, VariableDeclarationNode } from "./NodeTypes.js";
 
 export class Parser
 {
@@ -162,7 +162,18 @@ export class Parser
 
         if (isValueToken(token)) return this.value_token_dispatch(token);
 
+        if (isScopeToken(token)) return this.scope_token(token);
+
         if (isFunctionCallToken(token)) return this.create_function(token);
+    }
+
+    scope_token(current : ScopeToken) : ScopeNode
+    {
+        let parser = new Parser(current.tokens);
+        
+        return new ScopeNode(
+            parser.read()
+        )
     }
 
     parse_delimited(begin : TokenFilter, seperator : TokenFilter, end : TokenFilter): INode[]

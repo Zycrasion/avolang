@@ -1,6 +1,6 @@
 import { AvoTypes } from "../AvoGlobals.js";
 import { FunctionCallNode, INode } from "../Parser/NodeTypes.js";
-import { AvoReturn, EvaluateNode, Scope } from "./Interpreter.js";
+import { AvoReturn, EvaluateNode, FindFunctionWithinScope, Scope } from "./Interpreter.js";
 
 export interface AvoFunction
 {
@@ -18,13 +18,13 @@ export function FunctionBuilder(callback : (...a : any[]) => any, param_len : nu
     }
 }
 
-export function CallAvoFunction(scope : Scope, Func : AvoFunction, ...params : INode[]) : AvoReturn
+export function CallAvoFunction(scope : Scope, Func : AvoFunction, params : INode[]) : AvoReturn
 {
     let type = Func.ReturnType;
     let parameterLength = Func.Arguments;
     if (parameterLength !== params.length) {throw new Error(`Function Argument Mismatch!`);}
 
-    let paramsFiltered = params.map(v => EvaluateNode(v, scope).value) 
+    let paramsFiltered = params.map(v => EvaluateNode(v, scope).value)
 
     let value = Func.Callback(...paramsFiltered);
 
@@ -36,11 +36,11 @@ export function CallAvoFunction(scope : Scope, Func : AvoFunction, ...params : I
 
 export function EvaluateFunctionCall(node : FunctionCallNode, scope : Scope) : AvoReturn
 {
-    let referencedFunction = scope.Functions[node.name];
+    let referencedFunction = FindFunctionWithinScope(scope, node.name);
     if (referencedFunction === null || referencedFunction === undefined)
     {
         throw new Error(`Error! Function ${node.name} does not exist!`);
     }
 
-    return CallAvoFunction(scope, referencedFunction, ...node.params);
+    return CallAvoFunction(scope, referencedFunction, node.params);
 }

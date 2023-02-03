@@ -30,6 +30,37 @@ export function HasValue(v : IToken) : v is {tokenName : string, value : string}
     return v["value"] !== undefined;
 }
 
+// Scope Token
+// eg. { let a  = "a"; }
+
+
+export class ScopeToken implements IToken
+{
+    tokenName = "ScopeToken";
+    tokens : IToken[];
+
+    constructor(tokens : IToken[] = [])
+    {
+        this.tokens = tokens;
+    }
+
+    push(token : IToken)
+    {
+        return this.tokens.push(token);
+    }
+
+    pop()
+    {
+        return this.tokens.pop()
+    }
+
+}
+
+export function isScopeToken(token : IToken) : token is ScopeToken
+{
+    return token.tokenName == "ScopeToken"
+}
+
 // Value Token
 // eg. "hi" 'hi' true false 19 1.9
 export class ValueToken implements IToken

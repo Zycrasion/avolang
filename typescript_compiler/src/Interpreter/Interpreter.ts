@@ -14,8 +14,38 @@ export interface AvoReturn
 
 export interface Scope
 {
+    ParentScope? : Scope,
     Functions : {[key : string] : AvoFunction},
     Variables : {[key : string] : AvoVariable},
+}
+
+export function CreateScope(parent : Scope = undefined) : Scope
+{
+    return {
+        ParentScope : parent,
+        Functions : {},
+        Variables : {}
+    }
+}
+
+export function FindFunctionWithinScope(scope : Scope, FunctionName : string)
+{
+    let func = scope.Functions[FunctionName];
+    if (func == null && scope.ParentScope != null)
+    {
+        return FindFunctionWithinScope(scope.ParentScope, FunctionName);
+    }
+    return func;
+}
+
+export function FindVariableWithinScope(scope : Scope, VariableName : string)
+{
+    let variable = scope.Variables[VariableName];
+    if (variable == null && scope.ParentScope != null)
+    {
+        return FindVariableWithinScope(scope.ParentScope, VariableName);
+    }
+    return variable;
 }
 
 export function EvaluateNode(node : INode, scope : Scope) : AvoReturn
@@ -26,14 +56,28 @@ export function EvaluateNode(node : INode, scope : Scope) : AvoReturn
     if (INode.isKeywordNode(node)) return EvaluateKeyword(node, scope);
     if (INode.isValueNode(node)) return EvaluateValue(node, scope);
     if (INode.isVariableDeclarationNode(node)) return EvaluateVariableDeclaration(node, scope);
+    if (INode.isScopeNode(node)) return RunAvo(node.tree, scope)
+    throw new Error("Error: Token passed to Evaluate Node isn't recognised ".concat(JSON.stringify(node)))
 }
 
-export function RunAvo(nodes : INode[])
+export function RunAvo(nodes : INode[], parent : Scope = undefined) : AvoReturn
 {
-    let scope = StandardScope;
-
+    let scope : Scope;
+    if (parent != undefined)
+    {
+        scope = CreateScope(parent);
+    } else 
+    {
+        scope = StandardScope;
+    }
+    
     for (let node of nodes)
     {
         EvaluateNode(node, scope);
+    }
+    
+    return {
+        type : "Void",
+        value: null
     }
 }

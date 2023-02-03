@@ -26,7 +26,7 @@ let StandardScope: Scope = {
         "io.print": FunctionBuilder(
             (a : any) =>
             {
-                process.stdout.write(JSON.stringify(a[0]))
+                process.stdout.write(JSON.stringify(a))
             },
             1,
             "Void"

@@ -1,5 +1,5 @@
 import { TokeniserPass } from "./Pass.js";
-import { FunctionCallToken, HasValue, IdentifierToken, isIdentiferToken, isPunctuationToken, IToken } from "./TokenTypes.js";
+import { FunctionCallToken, HasValue, IdentifierToken, isIdentiferToken, isPunctuationToken, IToken, PunctuationToken, ScopeToken } from "./TokenTypes.js";
 
 export class GroupRelatedPass implements TokeniserPass
 {
@@ -40,7 +40,7 @@ export class GroupRelatedPass implements TokeniserPass
         return this.current = this.content.at(++this.index);
     }
 
-    private ParseSeperated(begin : string, seperator: string, end: string)
+    private ParseSeparated(begin : string, seperator: string, end: string)
     {
         let parsed : IToken[] = [];
         if (HasValue(this.current) && this.current.value == begin) this.Next();
@@ -60,14 +60,29 @@ export class GroupRelatedPass implements TokeniserPass
     private ScanFunctionCall(curr: IdentifierToken): FunctionCallToken
     {
         let name = curr.value;
-        let params: IToken[] = this.ParseSeperated("(",",", ")");
+        let params: IToken[] = this.ParseSeparated("(",",", ")");
 
         return new FunctionCallToken(name, params);
+    }
+
+    private ScanScopeCall(curr: PunctuationToken): ScopeToken
+    {
+        let tokens : IToken[] = [];
+        let currentToken = this.Peek();
+        while (currentToken = this.Peek())
+        {
+            this.Next();
+            if (isPunctuationToken(currentToken) && currentToken.value == "}") break;
+            tokens.push(this.ParseToken(this.current));
+        }
+        return new ScopeToken(tokens);
     }
 
     private ParseToken(curr: IToken)
     {
         let next = this.Peek()
+
+        if (isPunctuationToken(curr) && curr.value == "{") return this.ScanScopeCall(curr);
 
         if (!isIdentiferToken(curr)) return curr;
         if (!(isPunctuationToken(next) && next.value == "(")) return curr;

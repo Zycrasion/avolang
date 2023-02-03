@@ -1,6 +1,6 @@
 import { AvoTypes, KeywordToAvotype } from "../AvoGlobals.js";
 import { IdentifierNode, INode, KeywordNode, VariableDeclarationNode } from "../Parser/NodeTypes.js";
-import { AvoReturn, EvaluateNode, Scope } from "./Interpreter.js";
+import { AvoReturn, EvaluateNode, FindVariableWithinScope, Scope } from "./Interpreter.js";
 import { EvaluateValue } from "./ValueHandler.js";
 
 export interface AvoVariable
@@ -12,7 +12,8 @@ export interface AvoVariable
 export function EvaluateIdentifier(node : IdentifierNode, scope : Scope) : AvoReturn
 {
     // Find out if it exists as a variable
-    let existsVariable = scope.Variables[node.id];
+    let existsVariable = FindVariableWithinScope(scope, node.id);
+
     if (existsVariable !== null)
     {
         return existsVariable;
