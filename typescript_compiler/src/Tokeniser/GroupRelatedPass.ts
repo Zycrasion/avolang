@@ -21,23 +21,42 @@ export class GroupRelatedPass implements TokeniserPass
         this.hasRun = false;
         this.content = content;
         this.index = 0;
+
+        // Typescript wouldn't stop screaming at me
+        this.current = {tokenName : "undefined"};
         this.Curr();
+        
         this.pass = [];
     }
 
     private Curr()
     {
-        return this.current = this.content.at(this.index);
+        let __temp__ = this.content.at(this.index);
+        if (__temp__ == undefined)
+        {
+            throw new Error("Tried to access out-of-bounds")
+        }
+        return this.current = __temp__;
     }
 
     private Peek()
     {
-        return this.current = this.content.at(this.index + 1);
+        let __temp__ = this.content.at(this.index + 1);
+        if (__temp__ == undefined)
+        {
+            throw new Error("Tried to access out-of-bounds")
+        }
+        return this.current = __temp__;
     }
 
     private Next()
     {
-        return this.current = this.content.at(++this.index);
+        let __temp__ = this.content.at(++ this.index);
+        if (__temp__ == undefined)
+        {
+            throw new Error("Tried to access out-of-bounds")
+        }
+        return this.current = __temp__;
     }
 
     private ParseSeparated(begin : string, seperator: string, end: string)
@@ -97,11 +116,13 @@ export class GroupRelatedPass implements TokeniserPass
     Run()
     {
         this.pass = [];
-        while (this.Curr() !== undefined)
+        let token = this.ParseToken(this.Curr());
+        this.pass.push(token);
+        while (this.index + 1 < this.content.length)
         {
+            this.Next();
             let token = this.ParseToken(this.Curr());
             this.pass.push(token);
-            this.Next();
         }
         return this.pass;
     }

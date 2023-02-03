@@ -63,7 +63,7 @@ export class ScopeNode implements INode
         return this.tree.push(...items);
     }
 
-    pop() : INode
+    pop() : INode | undefined
     {
         return this.tree.pop()
     }

@@ -5,6 +5,7 @@
         "module": "ESNext",
         "moduleResolution": "node",
         "resolveJsonModule": true,
+        "strict": true
     },
     "exclude": ["tests"],
     "ts-node": {
