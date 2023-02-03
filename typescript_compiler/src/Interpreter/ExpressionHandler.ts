@@ -31,6 +31,11 @@ export function EvaluateExpression(node: ExpressionNode, scope : Scope): AvoRetu
             throw new Error(`Operator ${node.operator} unsupported!`)
     }
 
+    if (type == null)
+    {
+        throw new Error("Type Mismatch")
+    }
+
     return {
         type,
         value: result

@@ -31,17 +31,23 @@ export class StringPass implements TokeniserPass
 
     private Curr()
     {
-        return this.current = this.content.at(this.index);
+        let __temp__ = this.content.at(this.index);
+        if (__temp__ == undefined) throw new Error("Tried to access out of bounds") 
+        return this.current = __temp__;
     }
 
     private Peek()
     {
-        return this.current = this.content.at(this.index + 1);
+        let __temp__ = this.content.at(this.index + 1);
+        if (__temp__ == undefined) throw new Error("Tried to access out of bounds") 
+        return this.current = __temp__;
     }
 
     private Next()
     {
-        return this.current = this.content.at(++this.index);
+        let __temp__ = this.content.at( ++ this.index);
+        if (__temp__ == undefined) throw new Error("Tried to access out of bounds") 
+        return this.current = __temp__;
     }
 
     private ReadUntil(endString: string, callback: (str: string) => boolean = (str: string) => false)
@@ -109,7 +115,7 @@ export class StringPass implements TokeniserPass
         )
     }
 
-    private ParseAtom(curr: string): IToken
+    private ParseAtom(curr: string): IToken | null
     {
         if (curr.length != 1)   throw new Error("TOKEN SIZE MUST BE 1");
 

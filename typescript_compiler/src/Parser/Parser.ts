@@ -1,6 +1,5 @@
 import { AvoTypes, KeywordToAvotype } from "../AvoGlobals.js";
 import { FunctionCallToken, IdentifierToken, isFunctionCallToken, isIdentiferToken, isKeywordToken, isOperatorToken, isPunctuationToken, isScopeToken, isValueToken, IToken, KeywordToken, OperatorToken, ScopeToken, ValueToken } from "../Tokeniser/TokenTypes.js";
-import { TokenFilter } from "./Filter.js";
 import { ExpressionNode, FunctionCallNode, IdentifierNode, INode, KeywordNode, ScopeNode, ValueNode, VariableDeclarationNode } from "./NodeTypes.js";
 
 interface OperatorPrecedence
@@ -221,29 +220,6 @@ export class Parser
         )
     }
 
-    parse_delimited(begin: TokenFilter, seperator: TokenFilter, end: TokenFilter): INode[]
-    {
-        if (!TokenFilter.evaluate(begin, this.current))
-        {
-            throw new Error("EXPECTED BEGINNING TOKEN");
-        }
-
-        let delimited: INode[] = [];
-
-        while (!TokenFilter.evaluate(end, this.peek()))
-        {
-            this.next();
-            if (TokenFilter.evaluate(seperator, this.current)) continue;
-
-            delimited.push(
-                this.parse_token(
-                    this.current
-                )
-            );
-        }
-
-        return delimited;
-    }
 
     read(): INode[]
     {

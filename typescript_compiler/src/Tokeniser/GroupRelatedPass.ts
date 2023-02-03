@@ -1,5 +1,5 @@
 import { TokeniserPass } from "./Pass.js";
-import { FunctionCallToken, HasValue, IdentifierToken, isIdentiferToken, isPunctuationToken, IToken, PunctuationToken, ScopeToken } from "./TokenTypes.js";
+import { FunctionCallToken, IdentifierToken, isIdentiferToken, isPunctuationToken, IToken, PunctuationToken, ScopeToken } from "./TokenTypes.js";
 
 export class GroupRelatedPass implements TokeniserPass
 {
@@ -62,11 +62,11 @@ export class GroupRelatedPass implements TokeniserPass
     private ParseSeparated(begin : string, seperator: string, end: string)
     {
         let parsed : IToken[] = [];
-        if (HasValue(this.current) && this.current.value == begin) this.Next();
+        if (isPunctuationToken(this.current) && this.current.value == begin) this.Next();
         let ActiveToken : IToken;
         while  ((ActiveToken = this.Next()) !== undefined)
         {
-            if (HasValue(ActiveToken))
+            if (isPunctuationToken(ActiveToken))
             {
                 if (ActiveToken.value == end) break;
             }
