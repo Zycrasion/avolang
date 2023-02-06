@@ -20,19 +20,15 @@ async function main()
 {
     let tokens = Tokenise(`
     {
-        var:int a = 10
+        var:int a = 10;
         {
-            var:int a = a * a
+            var:int a = 20
             io.println(a)
         }
-        io.println(a * a)
+        io.println(a)
     }
 
     `);
-
-    await writeFile("tokens.json", JSON.stringify(tokens));
-
-
     let tree = new Parser(tokens);
     let nodes = tree.read();
     await writeFile("tree.json", JSON.stringify(nodes));

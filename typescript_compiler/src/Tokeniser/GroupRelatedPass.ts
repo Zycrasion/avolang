@@ -1,5 +1,5 @@
 import { TokeniserPass } from "./Pass.js";
-import { FunctionCallToken, IdentifierToken, isIdentiferToken, isPunctuationToken, IToken, PunctuationToken, ScopeToken } from "./TokenTypes.js";
+import { FunctionCallToken, HasValue, IdentifierToken, isIdentiferToken, isPunctuationToken, IToken, PunctuationToken, ScopeToken } from "./TokenTypes.js";
 
 export class GroupRelatedPass implements TokeniserPass
 {
@@ -21,52 +21,33 @@ export class GroupRelatedPass implements TokeniserPass
         this.hasRun = false;
         this.content = content;
         this.index = 0;
-
-        // Typescript wouldn't stop screaming at me
-        this.current = {tokenName : "undefined"};
         this.Curr();
-        
         this.pass = [];
     }
 
     private Curr()
     {
-        let __temp__ = this.content.at(this.index);
-        if (__temp__ == undefined)
-        {
-            throw new Error("Tried to access out-of-bounds")
-        }
-        return this.current = __temp__;
+        return this.current = this.content.at(this.index);
     }
 
     private Peek()
     {
-        let __temp__ = this.content.at(this.index + 1);
-        if (__temp__ == undefined)
-        {
-            throw new Error("Tried to access out-of-bounds")
-        }
-        return this.current = __temp__;
+        return this.current = this.content.at(this.index + 1);
     }
 
     private Next()
     {
-        let __temp__ = this.content.at(++ this.index);
-        if (__temp__ == undefined)
-        {
-            throw new Error("Tried to access out-of-bounds")
-        }
-        return this.current = __temp__;
+        return this.current = this.content.at(++this.index);
     }
 
     private ParseSeparated(begin : string, seperator: string, end: string)
     {
         let parsed : IToken[] = [];
-        if (isPunctuationToken(this.current) && this.current.value == begin) this.Next();
+        if (HasValue(this.current) && this.current.value == begin) this.Next();
         let ActiveToken : IToken;
         while  ((ActiveToken = this.Next()) !== undefined)
         {
-            if (isPunctuationToken(ActiveToken))
+            if (HasValue(ActiveToken))
             {
                 if (ActiveToken.value == end) break;
             }
@@ -116,13 +97,11 @@ export class GroupRelatedPass implements TokeniserPass
     Run()
     {
         this.pass = [];
-        let token = this.ParseToken(this.Curr());
-        this.pass.push(token);
-        while (this.index + 1 < this.content.length)
+        while (this.Curr() !== undefined)
         {
-            this.Next();
             let token = this.ParseToken(this.Curr());
             this.pass.push(token);
+            this.Next();
         }
         return this.pass;
     }

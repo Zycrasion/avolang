@@ -14,7 +14,7 @@ export function EvaluateIdentifier(node : IdentifierNode, scope : Scope) : AvoRe
     // Find out if it exists as a variable
     let existsVariable = FindVariableWithinScope(scope, node.id);
 
-    if (existsVariable !== undefined)
+    if (existsVariable !== null)
     {
         return existsVariable;
     }

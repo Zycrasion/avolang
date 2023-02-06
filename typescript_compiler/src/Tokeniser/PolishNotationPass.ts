@@ -1,5 +1,5 @@
 import { TokeniserPass } from "./Pass.js";
-import { isFunctionCallToken, isOperatorToken, isScopeToken, IToken } from "./TokenTypes.js";
+import { isFunctionCallToken, isOperatorToken, IToken } from "./TokenTypes.js";
 
 export class PolishNotationPass implements TokeniserPass
 {
@@ -21,61 +21,56 @@ export class PolishNotationPass implements TokeniserPass
         this.hasRun = false;
         this.content = content;
         this.index = 0;
-        this.current = { "tokenName": "undefined" }
         this.Curr();
         this.pass = [];
     }
 
     private Curr()
     {
-        let __temp__ = this.content.at(this.index);
-        if (__temp__ == undefined) throw new Error("Tried to access object out-of-bounds")
-        return this.current = __temp__;
+        return this.current = this.content.at(this.index);
     }
 
     private Peek()
     {
-        let __temp__ = this.content.at(this.index + 1);
-        if (__temp__ == undefined) throw new Error("Tried to access object out-of-bounds")
-        return this.current = __temp__;
+        return this.current = this.content.at(this.index + 1);
     }
 
     private Next()
     {
-        let __temp__ = this.content.at(++this.index);
-        if (__temp__ == undefined) throw new Error("Tried to access object out-of-bounds")
-        return this.current = __temp__;
+        return this.current = this.content.at(++this.index);
+    }
+
+    private P3_ParseExpression(slice : IToken[]) : IToken[]
+    {
+        let num1 = slice[0]
+        let operator = slice[1];
+        let expr2 = slice.slice(2);
+        if (operator != undefined && isOperatorToken(operator))
+        {
+            return [operator, num1, ...this.P3_ParseExpression(expr2)]
+        } else 
+        {
+            return [num1];
+        }
     }
 
     private MainDispatch(tokens: IToken[])
     {
-        let final : IToken[] = [];
+        let final = [];
         for (let i = 0; i < tokens.length; i = final.length)
         {
             let curr = tokens[i];
-
-            if (isFunctionCallToken(curr))
-            {
-                curr.params = this.MainDispatch(curr.params);
-            }
-
-            if (isScopeToken(curr))
-            {
-                curr.tokens = this.MainDispatch(curr.tokens)
-            }
-
-            // First, check if the next token is an operator, 1 * 2
-            //                                                 ^
-            // if it is then move the operator in front of it * 1 2
             
-            if (i + 1 < tokens.length && isOperatorToken(tokens[i + 1]))
+            if (isFunctionCallToken(curr))
+                curr.params = this.MainDispatch(curr.params);
+
+            if (i + 1 < tokens.length && isOperatorToken(tokens[i+1]))
             {
-                final.push(tokens[i + 1], tokens[i])
+                final.push(...this.P3_ParseExpression(tokens.slice(i)));
             } else 
             {
-                final.push(tokens[i])
+                final.push(curr);
             }
-
         }
         return final
     }
