@@ -9,6 +9,7 @@
     },
     "exclude": ["tests"],
     "ts-node": {
-        "transpileOnly": true
+        // "transpileOnly": false,
+        // "swc": true
     }
 }

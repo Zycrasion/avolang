@@ -5,29 +5,9 @@ export interface IToken
     tokenName : string;
 }
 
-export function AssertType(tok : IToken, check : (tok : IToken) => boolean, crucial = false)
-{
-    if (!check(tok))
-    {
-        if (!crucial) return false
-        throw new Error("FAILED ASSERTION");
-    }
-    return true;
-}
-
-export function AssertValue(tok : IToken, value : string | number | boolean, crucial = false)
-{
-    if (tok["value"] === value)
-    {
-        return true;
-    }
-    if (!crucial) return false;
-    throw new Error(`Assertion Failed, Expected ${value} Recieved ${tok["value"]}`)
-}
-
 export function HasValue(v : IToken) : v is {tokenName : string, value : string}
 {
-    return v["value"] !== undefined;
+    return "value" in v;
 }
 
 // Scope Token
@@ -132,6 +112,7 @@ export class VariableDeclarationToken implements IToken
         this.tokenName = "VariableDeclarationToken";
         this.name = name;
         this.value = value;
+        this.type = type;
         if (this.type != this.value.type)
         {
             throw new Error(`Error Mismatch between types ${type} and ${value.type} with value of ${value.value.toString()}`);

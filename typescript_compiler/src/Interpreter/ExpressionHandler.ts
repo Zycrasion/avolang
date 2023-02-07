@@ -9,6 +9,8 @@ export function EvaluateExpression(node: ExpressionNode, scope : Scope): AvoRetu
     let result = 0;
     let type = a.type == b.type ? a.type : null;
 
+    if (type == null) throw new Error(`Type Mismatch ${a.type} and ${b.type}`)
+
     switch (node.operator)
     {
         case "+":

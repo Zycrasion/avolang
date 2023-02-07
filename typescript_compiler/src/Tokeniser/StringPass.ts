@@ -6,7 +6,7 @@ export class StringPass implements TokeniserPass
 {
     private index: number;
     private pass: IToken[];
-    private current: string;
+    private current: string | undefined;
     private content: string[];
     private hasRun: boolean;
 
@@ -49,19 +49,19 @@ export class StringPass implements TokeniserPass
         let entire = "";
         while (this.Next() != endString)
         {
-            if (callback(this.current)) { break; }
-            entire = entire.concat(this.current);
+            if (this.current != undefined && callback(this.current)) { break; }
+            entire = entire.concat(this.current != undefined ? this.current : "");
         }
         return entire;
     }
 
-    private ReadWhile(condition: (str: string) => boolean)
+    private ReadWhile(condition: (str: string | undefined) => boolean)
     {
         let entire = "";
         while (condition(this.Peek()))
         {
             this.Next();
-            entire = entire.concat(this.current);
+            entire = entire.concat(this.current == undefined ? "" : this.current);
         }
         return entire;
     }
@@ -109,7 +109,7 @@ export class StringPass implements TokeniserPass
         )
     }
 
-    private ParseAtom(curr: string): IToken
+    private ParseAtom(curr: string): IToken | null
     {
         if (curr.length != 1)   throw new Error("TOKEN SIZE MUST BE 1");
 
@@ -133,7 +133,7 @@ export class StringPass implements TokeniserPass
     Run(): IToken[]
     {
         this.pass = [];
-        while (this.current !== undefined)
+        while (this.current != undefined)
         {
             let token = this.ParseAtom(this.current);
             if (token != null)

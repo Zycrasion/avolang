@@ -5,7 +5,7 @@ export class PolishNotationPass implements TokeniserPass
 {
     private index: number;
     private pass: IToken[];
-    private current: IToken;
+    private current: IToken | undefined;
     private content: IToken[];
     private hasRun: boolean;
 

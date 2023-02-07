@@ -42,34 +42,41 @@ const KEYWORDS = [
 ]
 
 const is = {
-    whitespace(char : string) : boolean
+    whitespace(char : string | undefined) : boolean
     {
+        if (char == undefined) return false;
         return /[\w]/.test(char);
     },
-    punctuation(char : string) : boolean
+    punctuation(char : string | undefined) : boolean
     {
+        if (char == undefined) return false;
         return PUNC.includes(char);
     },
-    operator(char : string) : boolean
+    operator(char : string | undefined) : boolean
     {
+        if (char == undefined) return false;
         return OPERATORS.includes(char);
     },
-    digit(char : string) : boolean
+    digit(char : string | undefined) : boolean
     {
+        if (char == undefined) return false;
         return /[0-9]/.test(char)
     },
     identifier : {
-        start(char : string) : boolean 
+        start(char : string | undefined) : boolean 
         {
+            if (char == undefined) return false;
             return /[a-zA-Z]/.test(char);
         },
-        tail(char : string) : boolean
+        tail(char : string | undefined) : boolean
         {
+            if (char == undefined) return false;
             return is.identifier.start(char) || is.digit(char) || "_$.".includes(char);
         }
     },
-    keyword(word : string) : boolean
+    keyword(word : string | undefined) : boolean
     {
+        if (word == undefined) return false;
         return KEYWORDS.includes(word);
     }
 }

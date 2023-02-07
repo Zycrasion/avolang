@@ -5,7 +5,7 @@ export class GroupRelatedPass implements TokeniserPass
 {
     private index: number;
     private pass: IToken[];
-    private current: IToken;
+    private current: IToken | undefined;
     private content: IToken[];
     private hasRun: boolean;
 
@@ -43,8 +43,8 @@ export class GroupRelatedPass implements TokeniserPass
     private ParseSeparated(begin : string, seperator: string, end: string)
     {
         let parsed : IToken[] = [];
-        if (HasValue(this.current) && this.current.value == begin) this.Next();
-        let ActiveToken : IToken;
+        if (this.current != undefined && HasValue(this.current) && this.current.value == begin) this.Next();
+        let ActiveToken : IToken | undefined;
         while  ((ActiveToken = this.Next()) !== undefined)
         {
             if (HasValue(ActiveToken))
@@ -73,6 +73,7 @@ export class GroupRelatedPass implements TokeniserPass
         {
             this.Next();
             if (isPunctuationToken(currentToken) && currentToken.value == "}") break;
+            if (this.current == undefined) throw new Error("Expected Token");
             tokens.push(this.ParseToken(this.current));
         }
         return new ScopeToken(tokens);
@@ -85,6 +86,8 @@ export class GroupRelatedPass implements TokeniserPass
         if (isPunctuationToken(curr) && curr.value == "{") return this.ScanScopeCall(curr);
 
         if (!isIdentiferToken(curr)) return curr;
+
+        if (next == undefined) throw new Error("Expected Token")
         if (!(isPunctuationToken(next) && next.value == "(")) return curr;
         
         return this.ScanFunctionCall(curr);
@@ -97,9 +100,12 @@ export class GroupRelatedPass implements TokeniserPass
     Run()
     {
         this.pass = [];
-        while (this.Curr() !== undefined)
+        while (this.current != undefined)
         {
-            let token = this.ParseToken(this.Curr());
+            let curr = this.Curr();
+            if (curr == undefined) {break;}
+
+            let token = this.ParseToken(curr);
             this.pass.push(token);
             this.Next();
         }

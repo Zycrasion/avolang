@@ -19,7 +19,7 @@ export interface Scope
     Variables : {[key : string] : AvoVariable},
 }
 
-export function CreateScope(parent : Scope = undefined) : Scope
+export function CreateScope(parent : Scope | undefined = undefined) : Scope
 {
     return {
         ParentScope : parent,
@@ -28,7 +28,7 @@ export function CreateScope(parent : Scope = undefined) : Scope
     }
 }
 
-export function FindFunctionWithinScope(scope : Scope, FunctionName : string)
+export function FindFunctionWithinScope(scope : Scope, FunctionName : string) : AvoFunction
 {
     let func = scope.Functions[FunctionName];
     if (func == null && scope.ParentScope != null)
@@ -38,7 +38,7 @@ export function FindFunctionWithinScope(scope : Scope, FunctionName : string)
     return func;
 }
 
-export function FindVariableWithinScope(scope : Scope, VariableName : string)
+export function FindVariableWithinScope(scope : Scope, VariableName : string) : AvoVariable
 {
     let variable = scope.Variables[VariableName];
     if (variable == null && scope.ParentScope != null)
@@ -60,7 +60,7 @@ export function EvaluateNode(node : INode, scope : Scope) : AvoReturn
     throw new Error("Error: Token passed to Evaluate Node isn't recognised ".concat(JSON.stringify(node)))
 }
 
-export function RunAvo(nodes : INode[], parent : Scope = undefined) : AvoReturn
+export function RunAvo(nodes : INode[], parent : Scope | undefined = undefined) : AvoReturn
 {
     let scope : Scope;
     if (parent != undefined)
