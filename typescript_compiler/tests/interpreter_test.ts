@@ -19,15 +19,14 @@ function repeat(times: number, str: string | number): string
 async function main()
 {
     let tokens = Tokenise(`
-    {
-        var:int a = 10
-        {
-            var:int a = 20
-            io.println(a)
-        }
-        io.println(a)
-    }
-
+    var:int a = 10
+    var:int b = 10
+    # var:bool c = a == b
+    io.println(b)
+    io.print("Avolang Engine: ")
+    io.println(avo.engine)
+    io.print("Avolang Engine Version: ")
+    io.println(avo.engine.version)
     `);
     await writeFile("tokens.json", JSON.stringify(tokens))
 

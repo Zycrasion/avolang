@@ -18,7 +18,7 @@ let StandardScope: Scope = {
         "io.println": FunctionBuilder(
             (a: any) =>
             {
-                process.stdout.write(JSON.stringify(a) + "\n")
+                process.stdout.write(a + "\n")
             },
             1,
             "Void"
@@ -26,7 +26,7 @@ let StandardScope: Scope = {
         "io.print": FunctionBuilder(
             (a : any) =>
             {
-                process.stdout.write(JSON.stringify(a))
+                process.stdout.write(a)
             },
             1,
             "Void"
@@ -44,6 +44,11 @@ let StandardScope: Scope = {
         {
             "type" : "String",
             "value" : "Typescript"
+        },
+        "avo.engine.version":
+        {
+            "type" : "String",
+            "value" : (JSON.parse(await readFile("package.json", {encoding : "utf-8"})) as {version : string}).version
         }
     }
 }

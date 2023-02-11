@@ -109,9 +109,17 @@ export class StringPass implements TokeniserPass
         )
     }
 
+    private IgnoreCommment(curr : string) : null
+    {
+        this.ReadUntil("\n");
+        return null;
+    }
+
     private ParseAtom(curr: string): IToken | null
     {
-        if (curr.length != 1)   throw new Error("TOKEN SIZE MUST BE 1");
+        if (curr.length != 1) throw new Error("TOKEN SIZE MUST BE 1");
+
+        if (is.comment.one_line(curr)) return this.IgnoreCommment(curr)
 
         if (is.digit(curr)) return this.ParseNum(curr);
 
