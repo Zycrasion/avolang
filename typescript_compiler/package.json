@@ -1,6 +1,6 @@
 {
   "name": "typescript_compiler",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "",
   "main": "dist/CommandLineMain.js",
   "type": "module",
