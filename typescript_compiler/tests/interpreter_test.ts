@@ -20,9 +20,9 @@ async function main()
 {
     let tokens = Tokenise(`
     var:int a = 10
-    var:int b = 10
-    # var:bool c = a == b
-    io.println(b)
+    var:int b = 20
+    var:bool c = ?= a b
+    io.println(c)
     io.print("Avolang Engine: ")
     io.println(avo.engine)
     io.print("Avolang Engine Version: ")

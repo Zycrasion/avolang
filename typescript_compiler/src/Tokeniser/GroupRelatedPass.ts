@@ -89,7 +89,7 @@ export class GroupRelatedPass implements TokeniserPass
 
         if (next == undefined) throw new Error("Expected Token")
         if (!(isPunctuationToken(next) && next.value == "(")) return curr;
-        
+
         return this.ScanFunctionCall(curr);
     }
 

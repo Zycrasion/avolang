@@ -71,9 +71,9 @@ export class ValueToken implements IToken
         return this.isString() || this.isChar();
     }
 
-    isBool() : this is {type : "Boolean", value : boolean}
+    isBool() : this is {type : "Bool", value : boolean}
     {
-        return this.type == "Boolean";
+        return this.type == "Bool";
     }
 
     isNumber() : this is {type : "Float" | "Int", value : number}

@@ -1,7 +1,7 @@
-import { AvoTypes, KeywordToAvotype } from "../AvoGlobals.js";
-import { FunctionCallToken, IdentifierToken, isFunctionCallToken, isIdentiferToken, isKeywordToken, isOperatorToken, isPunctuationToken, isScopeToken, isValueToken, IToken, KeywordToken, OperatorToken, ScopeToken, ValueToken } from "../Tokeniser/TokenTypes.js";
+import { AvoTypes, ConditionalTypes, KeywordToAvotype } from "../AvoGlobals.js";
+import { FunctionCallToken, IdentifierToken, isFunctionCallToken, isIdentiferToken, isKeywordToken, isOperatorToken, isPunctuationToken, isScopeToken, isValueToken, IToken, KeywordToken, OperatorToken, PunctuationToken, ScopeToken, ValueToken } from "../Tokeniser/TokenTypes.js";
 import { TokenFilter } from "./Filter.js";
-import { ExpressionNode, FunctionCallNode, IdentifierNode, INode, KeywordNode, ScopeNode, ValueNode, VariableDeclarationNode } from "./NodeTypes.js";
+import { ConditionalNode, ExpressionNode, FunctionCallNode, IdentifierNode, INode, KeywordNode, ScopeNode, ValueNode, VariableDeclarationNode } from "./NodeTypes.js";
 
 const OperatorPrecedence =
 {
@@ -142,7 +142,7 @@ export class Parser
         if (current.value == "true" || current.value == "false")
         {
             return new ValueNode(
-                "Boolean",
+                "Bool",
                 current.value
             )
         }
@@ -165,6 +165,58 @@ export class Parser
         )
     }
 
+    conditional_parser(token: PunctuationToken): ConditionalNode
+    {
+        let next = this.next();
+        if (next == undefined) throw new Error("Expected token, Recieved undefined!");
+        if (!isPunctuationToken(next)) throw new Error("Expected punctuation recieved other");
+        // eq
+        if (next.value == "=")
+        {
+            let type: ConditionalTypes = ConditionalTypes.EQ;
+            let peek = this.peek();
+            if (peek !== undefined && isPunctuationToken(peek))
+            {
+                if (peek.value == ">")
+                {
+                    type = ConditionalTypes.GT_EQ;
+                    this.next();
+                } else if (peek.value == "<")
+                {
+                    type = ConditionalTypes.LT_EQ;
+                    this.next();
+                }
+            }
+            return new ConditionalNode(
+                type, 
+                this.parse_token(this.next()), 
+                this.parse_token(this.next())
+            );
+        } else if (next.value == ">" || next.value == "<")
+        {
+            return new ConditionalNode(
+                {">" : ConditionalTypes.GT, "<" : ConditionalTypes.LT}[next.value], 
+                this.parse_token(this.next()), 
+                this.parse_token(this.next())
+            );
+        }
+
+        throw new Error("Unrecognised token ".concat(JSON.stringify(token), " ", JSON.stringify(this.tokens)));
+    }
+
+    punctuation_dispatch(token: PunctuationToken): INode
+    {
+        if (token == undefined) throw new Error("Expected token, Recieved undefined!");
+
+        // Checking if its a conditional
+        if (token.value == "?")
+        {
+            return this.conditional_parser(token);
+        }
+
+        throw new Error("Unrecognised token ".concat(JSON.stringify(token), " ", JSON.stringify(this.tokens)));
+    }
+
     parse_token(token: IToken | undefined): INode
     {
 
@@ -181,6 +233,8 @@ export class Parser
         if (isScopeToken(token)) return this.scope_token(token);
 
         if (isFunctionCallToken(token)) return this.create_function(token);
+
+        if (isPunctuationToken(token)) return this.punctuation_dispatch(token);
 
         throw new Error("Unrecognised token ".concat(JSON.stringify(token), " ", JSON.stringify(this.tokens)));
     }

@@ -1,4 +1,5 @@
-import { ExpressionNode } from "../Parser/NodeTypes.js";
+import { ConditionalTypes } from "../AvoGlobals.js";
+import { ConditionalNode, ExpressionNode } from "../Parser/NodeTypes.js";
 import { AvoReturn, EvaluateNode, Scope } from "./Interpreter.js";
 
 export function EvaluateExpression(node: ExpressionNode, scope : Scope): AvoReturn
@@ -36,5 +37,50 @@ export function EvaluateExpression(node: ExpressionNode, scope : Scope): AvoRetu
     return {
         type,
         value: result
+    }
+}
+
+export function EvaluateConditional(node : ConditionalNode, scope : Scope) : AvoReturn
+{
+    let result : boolean = false;
+    let rhs = EvaluateNode(node.rhs, scope);
+    let lhs = EvaluateNode(node.lhs, scope);
+    if (rhs.type !== lhs.type) {throw new Error(`MISMATCHED TYPES BETWEEN ${JSON.stringify(rhs)} AND ${JSON.stringify(lhs)}`)}
+    
+    let r = rhs.value;
+    let l = lhs.value;
+    
+    switch (node.type)
+    {
+        case ConditionalTypes.EQ:
+            result = r === l;
+            break;
+            
+        case ConditionalTypes.GT:
+            result = r > l;
+            break;
+        
+        case ConditionalTypes.GT_EQ:
+            result = r >= l;
+            break;
+        
+        case ConditionalTypes.LT:
+            result = r < l;
+            break;
+        
+        case ConditionalTypes.LT_EQ:
+            result = r <= l;
+            break;
+        
+        case ConditionalTypes.NEQ:
+            result = r !== l;
+            break;
+        
+        default:
+            throw new Error(`Unrecognised ConditionalType ${node.type}`)
+    }
+    return {
+        type : "Bool",
+        value : result
     }
 }

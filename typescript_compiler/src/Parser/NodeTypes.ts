@@ -1,4 +1,4 @@
-import { AvoTypes } from "../AvoGlobals";
+import { AvoTypes, ConditionalTypes } from "../AvoGlobals";
 
 export namespace INode
 {
@@ -37,8 +37,12 @@ export namespace INode
         return node.nodeName == "ScopeNode";
     }
 
+    /**
+    * PLACEHOLDER FOR BETA BUILDS
+    */
     export function isXNode<Type extends INode>(node : INode, nodeName : string) : node is Type
     {
+        console.log(`IsXNode Used for ${nodeName}.`);
         return node.nodeName == nodeName;
     }
 }
@@ -47,6 +51,22 @@ export interface INode
 {
     nodeName : string;
 }
+
+export class ConditionalNode implements INode
+{
+    nodeName = "ConditionalNode";
+    type : ConditionalTypes;
+    lhs : INode;
+    rhs : INode;
+
+    constructor(type : ConditionalTypes, rhs : INode, lhs : INode)
+    {
+        this.type = type;
+        this.lhs = lhs;
+        this.rhs = rhs;
+    }
+}
+
 
 export class ScopeNode implements INode
 {

@@ -33,7 +33,7 @@ export function EvaluateVariableDeclaration(node : VariableDeclarationNode, scop
     let type = KeywordToAvotype(node.type);
     let valueRaw = EvaluateNode(node.value, scope);
     let value = valueRaw.value;
-    if (type !== valueRaw.type) throw new Error(`MISMATCHED TYPES ON VARIABLE DECLARATION: ${name}`)
+    if (type !== valueRaw.type) throw new Error(`MISMATCHED TYPES ON VARIABLE DECLARATION: ${name} and ${type}, ${valueRaw.type}`)
 
     let variable = scope.Variables[name] = {
         type,

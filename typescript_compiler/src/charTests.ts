@@ -9,7 +9,10 @@ const PUNC = [
     "]",
     "(",
     ")",
-    "="
+    "=",
+    "?",
+    ">",
+    "<",    
 ];
 
 const COMMENT_ONE_LINE = "#"
