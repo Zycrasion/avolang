@@ -1,6 +1,0 @@
-var:int b = 2 * 2;
-var:int random_variable = rand.randint(5);
-io.println("TESTING POLISH NOTATION");
-io.println(3 * 2 + 1 / 2);
-io.println(random_variable );
-io.println(rand.randint(5) * 2)

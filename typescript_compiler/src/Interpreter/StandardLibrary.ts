@@ -16,17 +16,17 @@ let StandardScope: Scope = {
             "String"
         ),
         "io.println": FunctionBuilder(
-            (a: any) =>
+            (a: number | string | boolean) =>
             {
-                process.stdout.write(a + "\n")
+                process.stdout.write(a.toString() + "\n")
             },
             1,
             "Void"
         ),
         "io.print": FunctionBuilder(
-            (a : any) =>
+            (a : number | string | boolean) =>
             {
-                process.stdout.write(a)
+                process.stdout.write(a.toString())
             },
             1,
             "Void"

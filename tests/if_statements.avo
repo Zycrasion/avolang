@@ -1,0 +1,17 @@
+var:int a = rand.randint(100)
+var:int b = rand.randint(100)
+
+if (?> a b)
+{
+    io.print(a)
+    io.print(" a is greater than b ")
+    io.println(b)
+}
+
+
+if (?< a b)
+{
+    io.print(a)
+    io.print(" a is less than b ")
+    io.println(b)
+}
