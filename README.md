@@ -1,53 +1,106 @@
+
 # Avolang or Avocado Language
+
 Avocado language is currently a "toy langauge" its mainly for learning how compilers work. however i would like to get this to a stable release for use in custom game engines written in Typescript or Javascript. In the future i would love to compile this to C++ or C however i don't have the attention span to do that.
+
 ## Setup
+
 Typescript Compiler:
+
 ```bash
+
 cd typescript_compiler
+
 npm i
+
 npm run test
+
 npm run unit_tests
+
 ```
+
 ## Design
+
 I want the langauge to be human readable while also being easy for an interpereter to understand. It looks alot like Typescript with a few differences.
 
+  
+
 ## TODO (IN ORDER)
-[x] scopes ```{}```
-[x] conditionals ```?> a b``` (greater than)
-[x] if ```if (cond) {}```
-[] else ```else {}```
-[] else if ```elif {}```
-[] while loops ```while(cond) {}```
-[] break ```break;```
-[] loops ```loop {}```
-[] functions ```func:type name(param) {}```
-[] compiler
+
+- [x] scopes ```{}```
+
+- [x] conditionals ```?> a b``` (greater than)
+
+- [x] if ```if (cond) {}```
+
+- [ ] else ```else {}```
+
+- [ ] else if ```elif {}```
+
+- [ ] while loops ```while(cond) {}```
+
+- [ ] break ```break;```
+
+- [ ] loops ```loop {}```
+
+- [ ] functions ```func:type name(param) {}```
+
+- [ ] compiler
+
+  
 
 ### Variables
+
 Avolang:
+
 ```
+
 var:char char_example = 'l';
+
 var:int int_example = 10;
+
 ```
+
 Typescript:
+
 ```ts
-let char_example : string = "l";
-let int_example : number = 10;
+
+let  char_example : string = "l";
+
+let  int_example : number = 10;
+
 ```
+
 as you can see Avolang has stricter types
+
 ### Functions
+
 Avolang:
+
 ```
+
 func:void print_AHHHH()
+
 {
-    out.print("AHHHH");
+
+out.print("AHHHH");
+
 }
+
 ```
+
 Typescript:
+
 ```ts
-function print_AHHHH() : void
+
+function  print_AHHHH() : void
+
 {
-    console.log("AHHHH");
+
+console.log("AHHHH");
+
 }
+
 ```
-### 
+
+
