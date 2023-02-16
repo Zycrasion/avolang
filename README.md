@@ -11,6 +11,18 @@ npm run unit_tests
 ## Design
 I want the langauge to be human readable while also being easy for an interpereter to understand. It looks alot like Typescript with a few differences.
 
+## TODO (IN ORDER)
+[x] scopes ```{}```
+[x] conditionals ```?> a b``` (greater than)
+[x] if ```if (cond) {}```
+[] else ```else {}```
+[] else if ```elif {}```
+[] while loops ```while(cond) {}```
+[] break ```break;```
+[] loops ```loop {}```
+[] functions ```func:type name(param) {}```
+[] compiler
+
 ### Variables
 Avolang:
 ```
