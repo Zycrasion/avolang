@@ -41,6 +41,8 @@ I want the langauge to be human readable while also being easy for an interperet
 
 - [ ] else if ```elif {}```
 
+- [ ] conditional revamp ```a > b``` ```!(a > b)```
+
 - [ ] while loops ```while(cond) {}```
 
 - [ ] break ```break;```
