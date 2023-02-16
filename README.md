@@ -1,7 +1,11 @@
 
 # Avolang or Avocado Language
 
-Avocado language is currently a "toy langauge" its mainly for learning how compilers work. however i would like to get this to a stable release for use in custom game engines written in Typescript or Javascript. In the future i would love to compile this to C++ or C however i don't have the attention span to do that.
+Avocado language is currently a "toy langauge" its mainly for learning how compilers work. It is in its early stages, still being powered by an interpreter. I have a long way to go before a v1.0.0 before that I need to implement several features.
+
+## Contributing
+
+This is a personal project so no pull requests will be accepted.
 
 ## Setup
 
