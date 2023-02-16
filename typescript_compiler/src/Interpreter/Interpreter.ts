@@ -1,7 +1,8 @@
 import { AvoTypes } from "../AvoGlobals.js";
-import { ConditionalNode, INode } from "../Parser/NodeTypes.js";
+import { ConditionalNode, IfNode, INode } from "../Parser/NodeTypes.js";
 import { EvaluateConditional, EvaluateExpression } from "./ExpressionHandler.js";
 import { AvoFunction, EvaluateFunctionCall } from "./FunctionCallHandler.js";
+import { EvaluateIfNode } from "./RunnablesHandler.js";
 import StandardScope from "./StandardLibrary.js";
 import { EvaluateValue } from "./ValueHandler.js";
 import { AvoVariable, EvaluateIdentifier, EvaluateKeyword, EvaluateVariableDeclaration } from "./VariableHandler.js";
@@ -56,7 +57,8 @@ export function EvaluateNode(node : INode, scope : Scope) : AvoReturn
     if (INode.isKeywordNode(node)) return EvaluateKeyword(node, scope);
     if (INode.isValueNode(node)) return EvaluateValue(node, scope);
     if (INode.isVariableDeclarationNode(node)) return EvaluateVariableDeclaration(node, scope);
-    if (INode.isXNode<ConditionalNode>(node, "ConditionalNode")) return EvaluateConditional(node, scope)
+    if (INode.isConditionalNode(node)) return EvaluateConditional(node, scope);
+    if (INode.isIfNode(node)) return EvaluateIfNode(node, scope)
     if (INode.isScopeNode(node)) return RunAvo(node.tree, scope)
     throw new Error("Error: Token passed to Evaluate Node isn't recognised ".concat(JSON.stringify(node)))
 }

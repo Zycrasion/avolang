@@ -31,6 +31,7 @@ const KEYWORDS = [
     // descriptors
     'var',
     'func',
+    'if',
 
     // TYPES
 

@@ -1,7 +1,7 @@
 import { AvoTypes, ConditionalTypes, KeywordToAvotype } from "../AvoGlobals.js";
 import { FunctionCallToken, IdentifierToken, isFunctionCallToken, isIdentiferToken, isKeywordToken, isOperatorToken, isPunctuationToken, isScopeToken, isValueToken, IToken, KeywordToken, OperatorToken, PunctuationToken, ScopeToken, ValueToken } from "../Tokeniser/TokenTypes.js";
 import { TokenFilter } from "./Filter.js";
-import { ConditionalNode, ExpressionNode, FunctionCallNode, IdentifierNode, INode, KeywordNode, ScopeNode, ValueNode, VariableDeclarationNode } from "./NodeTypes.js";
+import { ConditionalNode, ExpressionNode, FunctionCallNode, IdentifierNode, IfNode, INode, KeywordNode, ScopeNode, ValueNode, VariableDeclarationNode } from "./NodeTypes.js";
 
 const OperatorPrecedence =
 {
@@ -36,6 +36,13 @@ export class Parser
     next(): IToken | undefined
     {
         return this.current = this.tokens.at(++this.index);
+    }
+
+    next_filtered(): IToken
+    {
+        let a  = this.next();
+        if (a === undefined) throw new Error("Expected Token Recieved Undefined");
+        return a;
     }
 
     peek(): IToken | undefined
@@ -137,6 +144,25 @@ export class Parser
         )
     }
 
+    if_parser(current : KeywordToken) : IfNode
+    {
+        let next = this.next_filtered();
+        if (!(isPunctuationToken(next) && next.value == "(")) throw new Error("Expected ( recieved " + JSON.stringify(next));
+
+        let conditional = this.parse_token(this.next());
+        
+        let end_bracket = this.next_filtered();
+        if (!(isPunctuationToken(end_bracket) && end_bracket.value == ")")) throw new Error("Expected ) recieved " + JSON.stringify(next));
+
+        let scope = this.parse_token(this.next());
+        if (!INode.isScopeNode(scope)) throw new Error("Expected Scope node!");
+
+        return new IfNode(
+            conditional,
+            scope
+        )
+    }
+
     keyword_dispatch(current: KeywordToken): INode
     {
         if (current.value == "true" || current.value == "false")
@@ -145,6 +171,11 @@ export class Parser
                 "Bool",
                 current.value
             )
+        }
+
+        if (current.value == "if")
+        {
+            return this.if_parser(current);
         }
 
         if (current.value == "var")

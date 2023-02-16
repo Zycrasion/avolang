@@ -19,14 +19,25 @@ function repeat(times: number, str: string | number): string
 async function main()
 {
     let tokens = Tokenise(`
-    var:int a = 10
-    var:int b = 20
-    var:bool c = ?= a b
-    io.println(c)
-    io.print("Avolang Engine: ")
-    io.println(avo.engine)
-    io.print("Avolang Engine Version: ")
-    io.println(avo.engine.version)
+    var:int a = rand.randint(100)
+    var:int b = rand.randint(100)
+
+    if (?> a b)
+    {
+        io.println("a is greater than b")
+    }
+
+    if (?< a b)
+    {
+        io.println("b is greater than a")
+    }
+
+    io.print("a:")
+    io.println(a)
+
+    io.print("b:")
+    io.println(b)
+
     `);
     await writeFile("tokens.json", JSON.stringify(tokens))
 

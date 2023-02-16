@@ -37,6 +37,17 @@ export namespace INode
         return node.nodeName == "ScopeNode";
     }
 
+    export function isIfNode(node : INode) : node is IfNode
+    {
+        return node.nodeName == "IfNode";
+    }
+
+    export function isConditionalNode(node : INode) : node is ConditionalNode
+    {
+        return node.nodeName == "ConditionalNode";
+    }
+
+
     /**
     * PLACEHOLDER FOR BETA BUILDS
     */
@@ -50,6 +61,20 @@ export namespace INode
 export interface INode
 {
     nodeName : string;
+}
+
+export class IfNode implements INode
+{
+    nodeName = "IfNode";
+    conditional : INode;
+    scope : ScopeNode;
+
+    constructor(conditional : INode, scope : ScopeNode)
+    {
+        this.conditional = conditional;
+        this.scope = scope;
+    }
+
 }
 
 export class ConditionalNode implements INode
