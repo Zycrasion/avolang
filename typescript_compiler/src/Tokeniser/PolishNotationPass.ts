@@ -1,5 +1,5 @@
 import { TokeniserPass } from "./Pass.js";
-import { isFunctionCallToken, isOperatorToken, IToken } from "./TokenTypes.js";
+import { isFunctionCallToken, isOperatorToken, isScopeToken, IToken } from "./TokenTypes.js";
 
 export class PolishNotationPass implements TokeniserPass
 {
@@ -40,6 +40,9 @@ export class PolishNotationPass implements TokeniserPass
         return this.current = this.content.at(++this.index);
     }
 
+    /**
+     * Black magic
+     */
     private P3_ParseExpression(slice : IToken[]) : IToken[]
     {
         let num1 = slice[0]
@@ -63,6 +66,9 @@ export class PolishNotationPass implements TokeniserPass
             
             if (isFunctionCallToken(curr))
                 curr.params = this.MainDispatch(curr.params);
+
+            if (isScopeToken(curr))
+                curr.tokens = this.MainDispatch(curr.tokens);
 
             if (i + 1 < tokens.length && isOperatorToken(tokens[i+1]))
             {

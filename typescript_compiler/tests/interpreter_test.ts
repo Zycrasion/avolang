@@ -22,12 +22,22 @@ async function main()
     var:int a = rand.randint(100)
     var:int b = rand.randint(100)
 
-    if (?> a b)
+    {
+        var:int a = 10
+        var:int b = 10
+
+        if a == b
+        {
+            io.println("a is the same as b")
+        }
+    }
+
+    if a > b
     {
         io.println("a is greater than b")
     }
 
-    if (?< a b)
+    if a < b
     {
         io.println("b is greater than a")
     }

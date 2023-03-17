@@ -1,5 +1,5 @@
 import { TokeniserPass } from "./Pass.js";
-import { FunctionCallToken, HasValue, IdentifierToken, isIdentiferToken, isPunctuationToken, IToken, PunctuationToken, ScopeToken } from "./TokenTypes.js";
+import { FunctionCallToken, HasValue, IdentifierToken, isIdentiferToken, isPunctuationToken, IToken, OperatorToken, PunctuationToken, ScopeToken } from "./TokenTypes.js";
 
 export class GroupRelatedPass implements TokeniserPass
 {
@@ -51,8 +51,10 @@ export class GroupRelatedPass implements TokeniserPass
             {
                 if (ActiveToken.value == end) break;
             }
-
-            parsed.push(this.ParseToken(ActiveToken));
+            if (ActiveToken !== undefined)
+            {
+                parsed.push(this.ParseToken(ActiveToken));
+            }
         }
         return parsed;
     }
@@ -79,11 +81,27 @@ export class GroupRelatedPass implements TokeniserPass
         return new ScopeToken(tokens);
     }
 
-    private ParseToken(curr: IToken)
+    private ScanConditional(curr : PunctuationToken) : IToken 
+    {
+        let peek = this.Peek();
+        if (peek == undefined) {return curr;}
+        if (isPunctuationToken(peek) && peek.value == "=")
+        {
+            this.Next();
+            return new OperatorToken(
+                "=="
+            )
+        }
+        return curr;
+    }
+
+    private ParseToken(curr: IToken) : IToken
     {
         let next = this.Peek()
 
         if (isPunctuationToken(curr) && curr.value == "{") return this.ScanScopeCall(curr);
+
+        if (isPunctuationToken(curr) && curr.value == "=") return this.ScanConditional(curr);
 
         if (!isIdentiferToken(curr)) return curr;
 

@@ -55,9 +55,15 @@ export class Parser
         return this.index >= this.tokens.length
     }
 
-    create_expression(op_tok: OperatorToken): ExpressionNode
+    create_expression(op_tok: OperatorToken): ExpressionNode | ConditionalNode
     {
         let op = op_tok.value;
+
+        if (op == ">" || op == "<" || op == "==")
+        {
+            return this.conditional_parser(op_tok);
+        }
+
         let lhs = this.parse_token(this.next());
         let rhs = this.parse_token(this.next());
         if (lhs == undefined || rhs == undefined) throw new Error("Undefined Token")
@@ -146,15 +152,9 @@ export class Parser
 
     if_parser(current : KeywordToken) : IfNode
     {
-        let next = this.next_filtered();
-        if (!(isPunctuationToken(next) && next.value == "(")) throw new Error("Expected ( recieved " + JSON.stringify(next));
+        let conditional = this.parse_token(this.next_filtered());
 
-        let conditional = this.parse_token(this.next());
-        
-        let end_bracket = this.next_filtered();
-        if (!(isPunctuationToken(end_bracket) && end_bracket.value == ")")) throw new Error("Expected ) recieved " + JSON.stringify(next));
-
-        let scope = this.parse_token(this.next());
+        let scope = this.parse_token(this.next_filtered());
         if (!INode.isScopeNode(scope)) throw new Error("Expected Scope node!");
 
         return new IfNode(
@@ -196,40 +196,21 @@ export class Parser
         )
     }
 
-    conditional_parser(token: PunctuationToken): ConditionalNode
+    conditional_parser(token: OperatorToken): ConditionalNode
     {
-        let next = this.next();
-        if (next == undefined) throw new Error("Expected token, Recieved undefined!");
-        if (!isPunctuationToken(next)) throw new Error("Expected punctuation recieved other");
-        // eq
-        if (next.value == "=")
-        {
-            let type: ConditionalTypes = ConditionalTypes.EQ;
-            let peek = this.peek();
-            if (peek !== undefined && isPunctuationToken(peek))
-            {
-                if (peek.value == ">")
-                {
-                    type = ConditionalTypes.GT_EQ;
-                    this.next();
-                } else if (peek.value == "<")
-                {
-                    type = ConditionalTypes.LT_EQ;
-                    this.next();
-                }
-            }
-            return new ConditionalNode(
-                type, 
-                this.parse_token(this.next()), 
-                this.parse_token(this.next())
-            );
-        } else if (next.value == ">" || next.value == "<")
+        let op = token;
+        let table = {
+            ">" : ConditionalTypes.GT,
+            "<" : ConditionalTypes.LT,
+            "==" : ConditionalTypes.EQ
+        }
+        if (op.value in table)
         {
             return new ConditionalNode(
-                {">" : ConditionalTypes.GT, "<" : ConditionalTypes.LT}[next.value], 
-                this.parse_token(this.next()), 
-                this.parse_token(this.next())
-            );
+                table[op.value as keyof typeof table],
+                this.parse_token(this.next()),
+                this.parse_token(this.next()),
+            )
         }
 
         throw new Error("Unrecognised token ".concat(JSON.stringify(token), " ", JSON.stringify(this.tokens)));
@@ -238,12 +219,6 @@ export class Parser
     punctuation_dispatch(token: PunctuationToken): INode
     {
         if (token == undefined) throw new Error("Expected token, Recieved undefined!");
-
-        // Checking if its a conditional
-        if (token.value == "?")
-        {
-            return this.conditional_parser(token);
-        }
 
         throw new Error("Unrecognised token ".concat(JSON.stringify(token), " ", JSON.stringify(this.tokens)));
     }
