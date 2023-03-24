@@ -35,13 +35,13 @@ I want the langauge to be human readable while also being easy for an interperet
 
 - [x] conditionals ```?> a b``` (greater than)
 
-- [x] if ```if (cond) {}```
+- [x] if ```if cond {}```
 
 - [ ] else ```else {}```
 
 - [ ] else if ```elif {}```
 
-- [x] conditional revamp ```a > b``` ```!(a > b)```
+- [x] conditional revamp ```a > b``` ```!(a > b)``` 50% done (need unary operators to work)
 
 - [ ] while loops ```while(cond) {}```
 
