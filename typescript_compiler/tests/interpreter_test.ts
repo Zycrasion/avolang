@@ -24,11 +24,26 @@ async function main()
 
     {
         var:int a = 10
-        var:int b = 10
+        var:int b = 11
 
         if a == b
         {
             io.println("a is the same as b")
+        }
+
+        if a != b
+        {
+            io.println("a is not the same as b")
+        }
+
+        if a >= b
+        {
+            io.println("a is greater than or equal to b")
+        }
+
+        if a <= b
+        {
+            io.println("a is less than or equal to b")
         }
     }
 

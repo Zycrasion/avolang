@@ -59,7 +59,7 @@ export class Parser
     {
         let op = op_tok.value;
 
-        if (op == ">" || op == "<" || op == "==")
+        if (op == ">" || op == "<" || op.includes("="))
         {
             return this.conditional_parser(op_tok);
         }
@@ -202,8 +202,14 @@ export class Parser
         let table = {
             ">" : ConditionalTypes.GT,
             "<" : ConditionalTypes.LT,
-            "==" : ConditionalTypes.EQ
+            ">=" : ConditionalTypes.GT_EQ,
+            "<=" : ConditionalTypes.LT_EQ,
+            "==" : ConditionalTypes.EQ,
+            "!=" : ConditionalTypes.NEQ,
         }
+
+        if (!(op.value in table)) throw new Error(`${op.value} is an urecognised conditional`);
+
         if (op.value in table)
         {
             return new ConditionalNode(

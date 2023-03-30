@@ -1,5 +1,5 @@
 import { TokeniserPass } from "./Pass.js";
-import { FunctionCallToken, HasValue, IdentifierToken, isIdentiferToken, isPunctuationToken, IToken, OperatorToken, PunctuationToken, ScopeToken } from "./TokenTypes.js";
+import { FunctionCallToken, HasValue, IdentifierToken, isIdentiferToken, isOperatorToken, isPunctuationToken, IToken, OperatorToken, PunctuationToken, ScopeToken } from "./TokenTypes.js";
 
 export class GroupRelatedPass implements TokeniserPass
 {
@@ -81,7 +81,7 @@ export class GroupRelatedPass implements TokeniserPass
         return new ScopeToken(tokens);
     }
 
-    private ScanConditional(curr : PunctuationToken) : IToken 
+    private ScanConditional(curr : PunctuationToken | OperatorToken) : IToken 
     {
         let peek = this.Peek();
         if (peek == undefined) {return curr;}
@@ -89,9 +89,10 @@ export class GroupRelatedPass implements TokeniserPass
         {
             this.Next();
             return new OperatorToken(
-                "=="
+                curr.value.concat("=")
             )
         }
+
         return curr;
     }
 
@@ -102,6 +103,8 @@ export class GroupRelatedPass implements TokeniserPass
         if (isPunctuationToken(curr) && curr.value == "{") return this.ScanScopeCall(curr);
 
         if (isPunctuationToken(curr) && curr.value == "=") return this.ScanConditional(curr);
+
+        if (isOperatorToken(curr) && [">", "<", "!"].includes(curr.value)) return this.ScanConditional(curr)
 
         if (!isIdentiferToken(curr)) return curr;
 
