@@ -33,7 +33,10 @@ const KEYWORDS = [
     // descriptors
     'var',
     'func',
+
+    // Control Flow
     'if',
+    'else',
 
     // TYPES
 

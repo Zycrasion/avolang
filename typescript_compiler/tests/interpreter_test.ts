@@ -39,11 +39,9 @@ async function main()
         if a >= b
         {
             io.println("a is greater than or equal to b")
-        }
-
-        if a <= b
+        } else
         {
-            io.println("a is less than or equal to b")
+            io.println("else: a is greater than b")
         }
     }
 

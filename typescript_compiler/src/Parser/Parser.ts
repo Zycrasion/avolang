@@ -50,6 +50,13 @@ export class Parser
         return this.current = this.tokens.at(this.index + 1);
     }
 
+    peek_filtered(): IToken
+    {
+        let a  = this.peek();
+        if (a === undefined) throw new Error("Expected Token Recieved Undefined");
+        return a;
+    }
+
     end(): boolean
     {
         return this.index >= this.tokens.length
@@ -157,10 +164,22 @@ export class Parser
         let scope = this.parse_token(this.next_filtered());
         if (!INode.isScopeNode(scope)) throw new Error("Expected Scope node!");
 
-        return new IfNode(
+        let node = new IfNode(
             conditional,
             scope
         )
+
+        let else_token = this.peek_filtered()
+        if (isKeywordToken(else_token) && else_token.value == "else")
+        {
+            this.next()
+
+            let else_scope = this.parse_token(this.next_filtered());
+            if (!INode.isScopeNode(else_scope)) throw new Error("Expected Scope node!");
+            node.else_scope = else_scope;
+        }
+     
+        return node
     }
 
     keyword_dispatch(current: KeywordToken): INode

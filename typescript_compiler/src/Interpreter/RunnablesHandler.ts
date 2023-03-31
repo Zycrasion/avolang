@@ -9,6 +9,9 @@ export function EvaluateIfNode(node : IfNode, scope : Scope) : AvoReturn
     if (conditional.value)
     {
         EvaluateNode(node.scope, scope);
+    } else if (node.else_scope !== undefined)
+    {
+        EvaluateNode(node.else_scope, scope)
     }
 
     return {

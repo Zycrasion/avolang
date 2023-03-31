@@ -68,6 +68,7 @@ export class IfNode implements INode
     nodeName = "IfNode";
     conditional : INode;
     scope : ScopeNode;
+    else_scope : ScopeNode | undefined;
 
     constructor(conditional : INode, scope : ScopeNode)
     {

@@ -14,12 +14,10 @@ export function EvaluateIdentifier(node : IdentifierNode, scope : Scope) : AvoRe
     // Find out if it exists as a variable
     let existsVariable = FindVariableWithinScope(scope, node.id);
 
-    if (existsVariable !== null)
-    {
-        return existsVariable;
-    }
-
-    throw new Error(`Identifier ${node.id} Does Not Exist`)
+    if (existsVariable == null || existsVariable == undefined)
+        throw new Error(`Identifier ${node.id} Does Not Exist`)
+    
+    return existsVariable;
 }
 
 export function EvaluateKeyword(node : KeywordNode, scope : Scope) : AvoReturn
