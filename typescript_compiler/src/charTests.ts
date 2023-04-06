@@ -36,6 +36,7 @@ const KEYWORDS = [
 
     // Control Flow
     'if',
+    'ifnot',
     'else',
 
     // TYPES

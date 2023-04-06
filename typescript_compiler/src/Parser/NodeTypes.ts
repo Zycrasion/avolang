@@ -47,6 +47,10 @@ export namespace INode
         return node.nodeName == "ConditionalNode";
     }
 
+    export function isUnaryOperatorNode(node: INode) : node is UnaryOperatorNode
+    {
+        return node.nodeName == "UnaryOperatorNode";
+    }
 
     /**
     * PLACEHOLDER FOR BETA BUILDS
@@ -192,5 +196,18 @@ export class FunctionCallNode implements INode
     {
         this.name = name;
         this.params = params;
+    }
+}
+
+export class UnaryOperatorNode implements INode
+{
+    nodeName = "UnaryOperatorNode";
+    operator : string;
+    body : INode;
+
+    constructor(operator : string, body : INode)
+    {
+        this.operator = operator;
+        this.body = body;
     }
 }

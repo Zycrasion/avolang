@@ -1,5 +1,5 @@
 import { ConditionalTypes } from "../AvoGlobals.js";
-import { ConditionalNode, ExpressionNode } from "../Parser/NodeTypes.js";
+import { ConditionalNode, ExpressionNode, UnaryOperatorNode } from "../Parser/NodeTypes.js";
 import { AvoReturn, EvaluateNode, Scope } from "./Interpreter.js";
 
 export function EvaluateExpression(node: ExpressionNode, scope : Scope): AvoReturn
@@ -38,6 +38,33 @@ export function EvaluateExpression(node: ExpressionNode, scope : Scope): AvoRetu
         type,
         value: result
     }
+}
+
+export function UnaryOperator(node: UnaryOperatorNode, scope : Scope) : AvoReturn
+{
+    let op = node.operator;
+    let result : AvoReturn;
+
+    switch(op)
+    {
+        case "!":
+        case "not":
+            result = EvaluateNode(node.body, scope);
+            if (result.type == "Bool")
+            {
+                result.value = !result.value;
+                return result;
+            } else 
+            {
+                throw Error(`Expected Boolean recieved ${result.type}`);
+            }
+            break;
+        
+        default:
+            throw Error(`Expected recognised operator, recieved ${op}`);
+
+    }
+    throw Error(`Expected recognised operator, recieved ${op}`);
 }
 
 export function EvaluateConditional(node : ConditionalNode, scope : Scope) : AvoReturn

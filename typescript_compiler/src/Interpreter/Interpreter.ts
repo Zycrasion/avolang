@@ -1,6 +1,6 @@
 import { AvoTypes } from "../AvoGlobals.js";
 import { ConditionalNode, IfNode, INode } from "../Parser/NodeTypes.js";
-import { EvaluateConditional, EvaluateExpression } from "./ExpressionHandler.js";
+import { EvaluateConditional, EvaluateExpression, UnaryOperator } from "./ExpressionHandler.js";
 import { AvoFunction, EvaluateFunctionCall } from "./FunctionCallHandler.js";
 import { EvaluateIfNode } from "./RunnablesHandler.js";
 import StandardScope from "./StandardLibrary.js";
@@ -60,6 +60,7 @@ export function EvaluateNode(node : INode, scope : Scope) : AvoReturn
     if (INode.isConditionalNode(node)) return EvaluateConditional(node, scope);
     if (INode.isIfNode(node)) return EvaluateIfNode(node, scope)
     if (INode.isScopeNode(node)) return RunAvo(node.tree, scope)
+    if (INode.isUnaryOperatorNode(node)) return UnaryOperator(node, scope);
     throw new Error("Error: Token passed to Evaluate Node isn't recognised ".concat(JSON.stringify(node)))
 }
 

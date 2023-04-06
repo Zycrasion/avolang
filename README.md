@@ -37,6 +37,8 @@ I want the langauge to be human readable while also being easy for an interperet
 
 - [x] if ```if cond {}```
 
+- [x] ifnot ```ifnot cond {}```
+
 - [x] else ```else {}```
 
 - [ ] else if ```elif {}```

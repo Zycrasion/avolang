@@ -31,7 +31,7 @@ async function main()
             io.println("a is the same as b")
         }
 
-        if a != b
+        ifnot a == b
         {
             io.println("a is not the same as b")
         }

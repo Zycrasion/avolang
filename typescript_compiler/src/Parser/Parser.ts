@@ -1,7 +1,7 @@
 import { AvoTypes, ConditionalTypes, KeywordToAvotype } from "../AvoGlobals.js";
 import { FunctionCallToken, IdentifierToken, isFunctionCallToken, isIdentiferToken, isKeywordToken, isOperatorToken, isPunctuationToken, isScopeToken, isValueToken, IToken, KeywordToken, OperatorToken, PunctuationToken, ScopeToken, ValueToken } from "../Tokeniser/TokenTypes.js";
 import { TokenFilter } from "./Filter.js";
-import { ConditionalNode, ExpressionNode, FunctionCallNode, IdentifierNode, IfNode, INode, KeywordNode, ScopeNode, ValueNode, VariableDeclarationNode } from "./NodeTypes.js";
+import { ConditionalNode, ExpressionNode, FunctionCallNode, IdentifierNode, IfNode, INode, KeywordNode, ScopeNode, UnaryOperatorNode, ValueNode, VariableDeclarationNode } from "./NodeTypes.js";
 
 const OperatorPrecedence =
 {
@@ -157,9 +157,14 @@ export class Parser
         )
     }
 
-    if_parser(current : KeywordToken) : IfNode
+    if_parser(current : KeywordToken, invert : boolean = false) : IfNode
     {
         let conditional = this.parse_token(this.next_filtered());
+        if (invert && INode.isConditionalNode(conditional))
+        {
+            let a = new UnaryOperatorNode("!", conditional);
+            conditional = a;
+        }
 
         let scope = this.parse_token(this.next_filtered());
         if (!INode.isScopeNode(scope)) throw new Error("Expected Scope node!");
@@ -195,6 +200,11 @@ export class Parser
         if (current.value == "if")
         {
             return this.if_parser(current);
+        }
+
+        if (current.value == "ifnot")
+        {
+            return this.if_parser(current, true);
         }
 
         if (current.value == "var")
